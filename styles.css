@@ -20,12 +20,19 @@ body {
 }
 
 h1 {
-  grid-column: 1 / -1;
   margin: 0;
-  padding: 0.5rem;
-  border: 1px solid #111;
   font-size: 1.5rem;
   font-weight: 600;
+}
+
+.topbar {
+  border: 1px solid #111;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
 }
 
 h2 {
@@ -51,6 +58,35 @@ h2 {
 .table-wrap {
   border: 1px solid #111;
   overflow: auto;
+}
+
+.cc-dialog {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.cc-dialog[aria-hidden="false"] {
+  display: flex;
+}
+
+.cc-dialog-panel {
+  width: min(760px, calc(100vw - 2rem));
+  background: #fff;
+  border: 1px solid #111;
+  padding: 0.75rem;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
 .cc-table {

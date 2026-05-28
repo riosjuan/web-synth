@@ -678,6 +678,9 @@ const audioStatus = document.getElementById("audio-status");
 const startAudioButton = document.getElementById("start-audio");
 const midiChannelSelect = document.getElementById("midi-channel");
 const ccMapBody = document.getElementById("cc-map-body");
+const ccMapDialog = document.getElementById("cc-map-dialog");
+const openCcMapButton = document.getElementById("open-cc-map");
+const closeCcMapButton = document.getElementById("close-cc-map");
 const inputByParam = {};
 const outputByParam = {};
 let selectedMidiChannel = "all";
@@ -1029,6 +1032,26 @@ function init() {
   midiChannelSelect.addEventListener("change", () => {
     synth.allNotesOff();
     selectedMidiChannel = midiChannelSelect.value;
+  });
+
+  openCcMapButton.addEventListener("click", () => {
+    ccMapDialog.setAttribute("aria-hidden", "false");
+  });
+
+  closeCcMapButton.addEventListener("click", () => {
+    ccMapDialog.setAttribute("aria-hidden", "true");
+  });
+
+  ccMapDialog.addEventListener("click", (event) => {
+    if (event.target === ccMapDialog) {
+      ccMapDialog.setAttribute("aria-hidden", "true");
+    }
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && ccMapDialog.getAttribute("aria-hidden") === "false") {
+      ccMapDialog.setAttribute("aria-hidden", "true");
+    }
   });
 
   startAudioButton.addEventListener("click", handleStartAudio);
