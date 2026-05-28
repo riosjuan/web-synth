@@ -1,0 +1,94 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #fff;
+  color: #111;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.3;
+}
+
+.app {
+  max-width: 100vw;
+  margin: 0 auto;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 0.75rem;
+}
+
+h1 {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0.5rem;
+  border: 1px solid #111;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.panel {
+  border: 1px solid #111;
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+fieldset {
+  border: 1px solid #111;
+  margin: 0;
+  padding: 0.5rem;
+  display: grid;
+  grid-template-columns: minmax(120px, 160px) 1fr auto;
+  gap: 0.45rem 0.5rem;
+  align-items: center;
+}
+
+label,
+input,
+select,
+button,
+output {
+  font: inherit;
+}
+
+output {
+  min-width: 3.5rem;
+  text-align: right;
+}
+
+button {
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+@media (max-width: 620px) {
+  fieldset {
+    grid-template-columns: 1fr;
+  }
+
+  output {
+    text-align: left;
+  }
+}

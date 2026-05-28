@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Synth</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <h1>Web Synth</h1>
+
+      <section class="panel">
+        <h2>System</h2>
+        <div class="row">
+          <button id="start-audio" type="button">Start Audio</button>
+          <span id="audio-status">Audio: locked</span>
+        </div>
+        <div class="row">
+          <label for="midi-channel">MIDI Channel</label>
+          <select id="midi-channel">
+            <option value="all" selected>All</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+            <option value="16">16</option>
+          </select>
+        </div>
+        <p id="midi-status">MIDI: checking...</p>
+        <p id="midi-activity">MIDI activity: none</p>
+      </section>
+
+      <section class="panel">
+        <h2>Oscillator 1</h2>
+        <fieldset>
+          <label for="osc1-wave">Waveform</label>
+          <select id="osc1-wave" data-param="osc1Wave">
+            <option value="sine">Sine</option>
+            <option value="triangle" selected>Triangle</option>
+            <option value="sawtooth">Sawtooth</option>
+            <option value="square">Square</option>
+          </select>
+
+          <label for="osc1-octave">Octave</label>
+          <input id="osc1-octave" data-param="osc1Octave" type="range" min="-2" max="2" step="1" value="0">
+          <output id="osc1-octave-value">0</output>
+
+          <label for="osc1-detune">Detune (cents)</label>
+          <input id="osc1-detune" data-param="osc1Detune" type="range" min="-50" max="50" step="1" value="0">
+          <output id="osc1-detune-value">0</output>
+
+          <label for="osc1-level">Level</label>
+          <input id="osc1-level" data-param="osc1Level" type="range" min="0" max="1" step="0.01" value="0.5">
+          <output id="osc1-level-value">0.50</output>
+        </fieldset>
+      </section>
+
+      <section class="panel">
+        <h2>Oscillator 2</h2>
+        <fieldset>
+          <label for="osc2-wave">Waveform</label>
+          <select id="osc2-wave" data-param="osc2Wave">
+            <option value="sine">Sine</option>
+            <option value="triangle">Triangle</option>
+            <option value="sawtooth" selected>Sawtooth</option>
+            <option value="square">Square</option>
+          </select>
+
+          <label for="osc2-octave">Octave</label>
+          <input id="osc2-octave" data-param="osc2Octave" type="range" min="-2" max="2" step="1" value="0">
+          <output id="osc2-octave-value">0</output>
+
+          <label for="osc2-detune">Detune (cents)</label>
+          <input id="osc2-detune" data-param="osc2Detune" type="range" min="-50" max="50" step="1" value="0">
+          <output id="osc2-detune-value">0</output>
+
+          <label for="osc2-level">Level</label>
+          <input id="osc2-level" data-param="osc2Level" type="range" min="0" max="1" step="0.01" value="0.5">
+          <output id="osc2-level-value">0.50</output>
+        </fieldset>
+      </section>
+
+      <section class="panel">
+        <h2>Filter</h2>
+        <fieldset>
+          <label for="filter-cutoff">Cutoff</label>
+          <input id="filter-cutoff" data-param="filterCutoff" type="range" min="80" max="12000" step="1" value="6000">
+          <output id="filter-cutoff-value">6000</output>
+
+          <label for="filter-q">Resonance</label>
+          <input id="filter-q" data-param="filterQ" type="range" min="0.1" max="20" step="0.1" value="0.8">
+          <output id="filter-q-value">0.8</output>
+        </fieldset>
+      </section>
+
+      <section class="panel">
+        <h2>Envelope</h2>
+        <fieldset>
+          <label for="env-attack">Attack (s)</label>
+          <input id="env-attack" data-param="attack" type="range" min="0.001" max="2" step="0.001" value="0.02">
+          <output id="env-attack-value">0.020</output>
+
+          <label for="env-decay">Decay (s)</label>
+          <input id="env-decay" data-param="decay" type="range" min="0.001" max="2" step="0.001" value="0.20">
+          <output id="env-decay-value">0.200</output>
+
+          <label for="env-sustain">Sustain</label>
+          <input id="env-sustain" data-param="sustain" type="range" min="0" max="1" step="0.01" value="0.7">
+          <output id="env-sustain-value">0.70</output>
+
+          <label for="env-release">Release (s)</label>
+          <input id="env-release" data-param="release" type="range" min="0.01" max="4" step="0.01" value="0.4">
+          <output id="env-release-value">0.40</output>
+        </fieldset>
+      </section>
+
+      <section class="panel">
+        <h2>Master</h2>
+        <fieldset>
+          <label for="master-volume">Volume</label>
+          <input id="master-volume" data-param="masterVolume" type="range" min="0" max="1" step="0.01" value="0.75">
+          <output id="master-volume-value">0.75</output>
+        </fieldset>
+      </section>
+
+    </main>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
