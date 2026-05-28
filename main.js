@@ -19,6 +19,16 @@ const MIDI_CC_MAP = {
   76: { name: "Vibrato Rate", target: "lfo1Rate" },
   77: { name: "Vibrato Depth", target: "lfo1Depth" },
   78: { name: "Vibrato Delay", target: "reserved" },
+  26: { name: "Undefined 26", target: "fxDelayTime" },
+  27: { name: "Undefined 27", target: "fxDelayFeedback" },
+  28: { name: "Undefined 28", target: "fxDelayMix" },
+  29: { name: "Undefined 29", target: "fxChorusRate" },
+  30: { name: "Undefined 30", target: "fxChorusDepth" },
+  31: { name: "Undefined 31", target: "fxChorusMix" },
+  85: { name: "Undefined 85", target: "fxReverbSize" },
+  86: { name: "Undefined 86", target: "fxReverbMix" },
+  87: { name: "Undefined 87", target: "fxDistDrive" },
+  88: { name: "Undefined 88", target: "fxDistMix" },
   120: { name: "All Sound Off", target: "allSoundOff" },
   123: { name: "All Notes Off", target: "allNotesOff" },
 };
@@ -55,6 +65,16 @@ const PARAM_CONFIG = {
   lfo1Depth: { min: 0, max: 1, step: 0.01, digits: 2 },
   lfo2Rate: { min: 0.01, max: 20, step: 0.01, digits: 2 },
   lfo2Depth: { min: 0, max: 1, step: 0.01, digits: 2 },
+  fxDelayTime: { min: 0, max: 127, step: 1, digits: 0 },
+  fxDelayFeedback: { min: 0, max: 127, step: 1, digits: 0 },
+  fxDelayMix: { min: 0, max: 127, step: 1, digits: 0 },
+  fxChorusRate: { min: 0, max: 127, step: 1, digits: 0 },
+  fxChorusDepth: { min: 0, max: 127, step: 1, digits: 0 },
+  fxChorusMix: { min: 0, max: 127, step: 1, digits: 0 },
+  fxReverbSize: { min: 0, max: 127, step: 1, digits: 0 },
+  fxReverbMix: { min: 0, max: 127, step: 1, digits: 0 },
+  fxDistDrive: { min: 0, max: 127, step: 1, digits: 0 },
+  fxDistMix: { min: 0, max: 127, step: 1, digits: 0 },
   masterVolume: { min: 0, max: 1, step: 0.01, digits: 2 },
 };
 
@@ -85,6 +105,16 @@ const params = {
   lfo2Depth: 0,
   lfo2RateMode: "free",
   lfo2Division: "1/4",
+  fxDelayTime: 32,
+  fxDelayFeedback: 22,
+  fxDelayMix: 12,
+  fxChorusRate: 26,
+  fxChorusDepth: 18,
+  fxChorusMix: 10,
+  fxReverbSize: 36,
+  fxReverbMix: 14,
+  fxDistDrive: 8,
+  fxDistMix: 6,
   masterVolume: 0.6,
 };
 
@@ -95,6 +125,30 @@ class Synth {
     this.masterGain = null;
     this.outputLimiter = null;
     this.filter = null;
+    this.fxInputGain = null;
+    this.fxDryGain = null;
+    this.fxWetGain = null;
+
+    this.delayNode = null;
+    this.delayFeedbackGain = null;
+    this.delaySendGain = null;
+    this.delayReturnGain = null;
+
+    this.chorusDelay = null;
+    this.chorusLfo = null;
+    this.chorusLfoDepthGain = null;
+    this.chorusSendGain = null;
+    this.chorusReturnGain = null;
+
+    this.reverbConvolver = null;
+    this.reverbSendGain = null;
+    this.reverbReturnGain = null;
+
+    this.distShaper = null;
+    this.distToneFilter = null;
+    this.distSendGain = null;
+    this.distReturnGain = null;
+
     this.voices = new Map();
     this.lfoState = {
       lfo1: { osc: null, gain: null, target: "off", depth: 0 },
@@ -136,10 +190,68 @@ class Synth {
     this.filter.frequency.value = cutoffControlToHz(this.params.filterCutoff);
     this.filter.Q.value = resonanceControlToQ(this.params.filterQ);
 
-    this.filter.connect(this.masterGain);
+    this.fxInputGain = this.audioContext.createGain();
+    this.fxDryGain = this.audioContext.createGain();
+    this.fxWetGain = this.audioContext.createGain();
+
+    this.delayNode = this.audioContext.createDelay(1.2);
+    this.delayFeedbackGain = this.audioContext.createGain();
+    this.delaySendGain = this.audioContext.createGain();
+    this.delayReturnGain = this.audioContext.createGain();
+
+    this.chorusDelay = this.audioContext.createDelay(0.05);
+    this.chorusLfo = this.audioContext.createOscillator();
+    this.chorusLfoDepthGain = this.audioContext.createGain();
+    this.chorusSendGain = this.audioContext.createGain();
+    this.chorusReturnGain = this.audioContext.createGain();
+
+    this.reverbConvolver = this.audioContext.createConvolver();
+    this.reverbSendGain = this.audioContext.createGain();
+    this.reverbReturnGain = this.audioContext.createGain();
+
+    this.distShaper = this.audioContext.createWaveShaper();
+    this.distToneFilter = this.audioContext.createBiquadFilter();
+    this.distToneFilter.type = "lowpass";
+    this.distToneFilter.frequency.value = 9000;
+    this.distSendGain = this.audioContext.createGain();
+    this.distReturnGain = this.audioContext.createGain();
+
+    this.filter.connect(this.fxInputGain);
+    this.fxInputGain.connect(this.fxDryGain);
+    this.fxInputGain.connect(this.delaySendGain);
+    this.fxInputGain.connect(this.chorusSendGain);
+    this.fxInputGain.connect(this.reverbSendGain);
+    this.fxInputGain.connect(this.distSendGain);
+
+    this.delaySendGain.connect(this.delayNode);
+    this.delayNode.connect(this.delayFeedbackGain);
+    this.delayFeedbackGain.connect(this.delayNode);
+    this.delayNode.connect(this.delayReturnGain);
+    this.delayReturnGain.connect(this.fxWetGain);
+
+    this.chorusSendGain.connect(this.chorusDelay);
+    this.chorusDelay.connect(this.chorusReturnGain);
+    this.chorusReturnGain.connect(this.fxWetGain);
+    this.chorusLfo.connect(this.chorusLfoDepthGain);
+    this.chorusLfoDepthGain.connect(this.chorusDelay.delayTime);
+    this.chorusLfo.start();
+
+    this.reverbSendGain.connect(this.reverbConvolver);
+    this.reverbConvolver.connect(this.reverbReturnGain);
+    this.reverbReturnGain.connect(this.fxWetGain);
+
+    this.distSendGain.connect(this.distShaper);
+    this.distShaper.connect(this.distToneFilter);
+    this.distToneFilter.connect(this.distReturnGain);
+    this.distReturnGain.connect(this.fxWetGain);
+
+    this.fxDryGain.connect(this.masterGain);
+    this.fxWetGain.connect(this.masterGain);
+
     this.masterGain.connect(this.outputLimiter);
     this.outputLimiter.connect(this.audioContext.destination);
 
+    this.updateEffectsFromParams();
     this.initLfos();
 
     if (this.audioContext.state === "suspended") {
@@ -186,7 +298,70 @@ class Synth {
 
     if (name.startsWith("lfo")) {
       this.updateLfoFromParams(name.slice(0, 4));
+      return;
     }
+
+    if (name.startsWith("fx")) {
+      this.updateEffectsFromParams();
+    }
+  }
+
+  updateEffectsFromParams() {
+    if (!this.audioContext) {
+      return;
+    }
+
+    const now = this.audioContext.currentTime;
+
+    const delayMix = controlToUnit(this.params.fxDelayMix);
+    const chorusMix = controlToUnit(this.params.fxChorusMix);
+    const reverbMix = controlToUnit(this.params.fxReverbMix);
+    const distMix = controlToUnit(this.params.fxDistMix);
+    const totalWet = Math.min(0.95, delayMix + chorusMix + reverbMix + distMix);
+    const dry = 1 - totalWet;
+
+    this.fxDryGain.gain.setTargetAtTime(dry, now, 0.01);
+    this.delaySendGain.gain.setTargetAtTime(delayMix, now, 0.01);
+    this.chorusSendGain.gain.setTargetAtTime(chorusMix, now, 0.01);
+    this.reverbSendGain.gain.setTargetAtTime(reverbMix, now, 0.01);
+    this.distSendGain.gain.setTargetAtTime(distMix, now, 0.01);
+
+    this.delayNode.delayTime.setTargetAtTime(
+      mapControl(this.params.fxDelayTime, 0.02, 0.8),
+      now,
+      0.01
+    );
+    this.delayFeedbackGain.gain.setTargetAtTime(
+      mapControl(this.params.fxDelayFeedback, 0, 0.85),
+      now,
+      0.01
+    );
+    this.delayReturnGain.gain.setTargetAtTime(0.8, now, 0.01);
+
+    this.chorusLfo.frequency.setTargetAtTime(
+      mapControl(this.params.fxChorusRate, 0.05, 8),
+      now,
+      0.01
+    );
+    this.chorusLfoDepthGain.gain.setTargetAtTime(
+      mapControl(this.params.fxChorusDepth, 0, 0.02),
+      now,
+      0.01
+    );
+    this.chorusDelay.delayTime.setTargetAtTime(0.012, now, 0.01);
+    this.chorusReturnGain.gain.setTargetAtTime(0.9, now, 0.01);
+
+    this.reverbConvolver.buffer = createReverbImpulse(
+      this.audioContext,
+      mapControl(this.params.fxReverbSize, 0.2, 6)
+    );
+    this.reverbReturnGain.gain.setTargetAtTime(0.9, now, 0.01);
+
+    this.distShaper.curve = makeDistortionCurve(
+      mapControl(this.params.fxDistDrive, 1, 400)
+    );
+    this.distShaper.oversample = "4x";
+    this.distReturnGain.gain.setTargetAtTime(0.8, now, 0.01);
   }
 
   initLfos() {
@@ -671,6 +846,38 @@ function sustainControlToLevel(value) {
   return Math.max(0, Math.min(127, value)) / 127;
 }
 
+function controlToUnit(value) {
+  return Math.max(0, Math.min(127, value)) / 127;
+}
+
+function mapControl(value, min, max) {
+  return min + controlToUnit(value) * (max - min);
+}
+
+function createReverbImpulse(audioContext, seconds) {
+  const length = Math.max(1, Math.floor(audioContext.sampleRate * seconds));
+  const impulse = audioContext.createBuffer(2, length, audioContext.sampleRate);
+  for (let channel = 0; channel < impulse.numberOfChannels; channel += 1) {
+    const data = impulse.getChannelData(channel);
+    for (let i = 0; i < length; i += 1) {
+      const decay = Math.pow(1 - i / length, 2);
+      data[i] = (Math.random() * 2 - 1) * decay;
+    }
+  }
+  return impulse;
+}
+
+function makeDistortionCurve(amount) {
+  const samples = 2048;
+  const curve = new Float32Array(samples);
+  const k = Math.max(1, amount);
+  for (let i = 0; i < samples; i += 1) {
+    const x = (i * 2) / samples - 1;
+    curve[i] = ((3 + k) * x * 20 * (Math.PI / 180)) / (Math.PI + k * Math.abs(x));
+  }
+  return curve;
+}
+
 const synth = new Synth({ ...params });
 const midiStatus = document.getElementById("midi-status");
 const midiClockStatus = document.getElementById("midi-clock-status");
@@ -711,6 +918,16 @@ const TARGET_LABELS = {
   lfo2RateMode: "LFO 2 rate mode",
   lfo1Division: "LFO 1 division",
   lfo2Division: "LFO 2 division",
+  fxDelayTime: "Delay time",
+  fxDelayFeedback: "Delay feedback",
+  fxDelayMix: "Delay mix",
+  fxChorusRate: "Chorus rate",
+  fxChorusDepth: "Chorus depth",
+  fxChorusMix: "Chorus mix",
+  fxReverbSize: "Reverb size",
+  fxReverbMix: "Reverb mix",
+  fxDistDrive: "Distortion drive",
+  fxDistMix: "Distortion mix",
 };
 
 function bindControls() {
