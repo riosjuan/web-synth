@@ -126,14 +126,14 @@ output {
   font: inherit;
 }
 
-fieldset > label {
+fieldset>label {
   display: block;
-  grid-column: 1 / -1;
+  grid-column: 1 / 2;
 }
 
-fieldset > input,
-fieldset > select {
-  grid-column: 1;
+fieldset>input,
+fieldset>select {
+  grid-column: 1 / -1;
   width: 100%;
 }
 
@@ -153,7 +153,7 @@ fieldset > select {
 output {
   grid-column: 2;
   min-width: 3.5rem;
-  text-align: left;
+  text-align: right;
   padding-left: 0;
   margin-top: 0;
   margin-bottom: 0.3rem;

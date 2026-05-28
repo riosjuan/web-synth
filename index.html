@@ -74,6 +74,7 @@
           </div>
 
           <label for="osc1-octave">Octave</label>
+          <output id="osc1-octave-value">0</output>
           <input
             id="osc1-octave"
             data-param="osc1Octave"
@@ -83,9 +84,9 @@
             step="1"
             value="0"
           />
-          <output id="osc1-octave-value">0</output>
 
           <label for="osc1-detune">Detune (cents)</label>
+          <output id="osc1-detune-value">0</output>
           <input
             id="osc1-detune"
             data-param="osc1Detune"
@@ -95,9 +96,9 @@
             step="1"
             value="0"
           />
-          <output id="osc1-detune-value">0</output>
 
           <label for="osc1-level">Level</label>
+          <output id="osc1-level-value">0.50</output>
           <input
             id="osc1-level"
             data-param="osc1Level"
@@ -107,7 +108,6 @@
             step="0.01"
             value="0.5"
           />
-          <output id="osc1-level-value">0.50</output>
         </fieldset>
       </section>
 
@@ -140,6 +140,7 @@
           </div>
 
           <label for="osc2-octave">Octave</label>
+          <output id="osc2-octave-value">0</output>
           <input
             id="osc2-octave"
             data-param="osc2Octave"
@@ -149,9 +150,9 @@
             step="1"
             value="0"
           />
-          <output id="osc2-octave-value">0</output>
 
           <label for="osc2-detune">Detune (cents)</label>
+          <output id="osc2-detune-value">0</output>
           <input
             id="osc2-detune"
             data-param="osc2Detune"
@@ -161,9 +162,9 @@
             step="1"
             value="0"
           />
-          <output id="osc2-detune-value">0</output>
 
           <label for="osc2-level">Level</label>
+          <output id="osc2-level-value">0.50</output>
           <input
             id="osc2-level"
             data-param="osc2Level"
@@ -173,7 +174,6 @@
             step="0.01"
             value="0.5"
           />
-          <output id="osc2-level-value">0.50</output>
         </fieldset>
       </section>
 
@@ -181,6 +181,7 @@
         <h2>Filter</h2>
         <fieldset>
           <label for="filter-cutoff">Cutoff</label>
+          <output id="filter-cutoff-value">109</output>
           <input
             id="filter-cutoff"
             data-param="filterCutoff"
@@ -190,9 +191,9 @@
             step="1"
             value="109"
           />
-          <output id="filter-cutoff-value">109</output>
 
           <label for="filter-q">Resonance</label>
+          <output id="filter-q-value">4</output>
           <input
             id="filter-q"
             data-param="filterQ"
@@ -202,7 +203,6 @@
             step="1"
             value="4"
           />
-          <output id="filter-q-value">4</output>
         </fieldset>
       </section>
 
@@ -210,6 +210,7 @@
         <h2>Envelope</h2>
         <fieldset>
           <label for="env-attack">Attack (s)</label>
+          <output id="env-attack-value">1</output>
           <input
             id="env-attack"
             data-param="attack"
@@ -219,9 +220,9 @@
             step="1"
             value="1"
           />
-          <output id="env-attack-value">1</output>
 
           <label for="env-decay">Decay (s)</label>
+          <output id="env-decay-value">13</output>
           <input
             id="env-decay"
             data-param="decay"
@@ -231,9 +232,9 @@
             step="1"
             value="13"
           />
-          <output id="env-decay-value">13</output>
 
           <label for="env-sustain">Sustain</label>
+          <output id="env-sustain-value">89</output>
           <input
             id="env-sustain"
             data-param="sustain"
@@ -243,9 +244,9 @@
             step="1"
             value="89"
           />
-          <output id="env-sustain-value">89</output>
 
           <label for="env-release">Release (s)</label>
+          <output id="env-release-value">12</output>
           <input
             id="env-release"
             data-param="release"
@@ -255,7 +256,6 @@
             step="1"
             value="12"
           />
-          <output id="env-release-value">12</output>
         </fieldset>
       </section>
 
@@ -280,6 +280,7 @@
           </select>
 
           <label for="lfo1-rate">Rate (Hz)</label>
+          <output id="lfo1-rate-value">4.00</output>
           <input
             id="lfo1-rate"
             data-param="lfo1Rate"
@@ -289,7 +290,6 @@
             step="0.01"
             value="4.00"
           />
-          <output id="lfo1-rate-value">4.00</output>
 
           <label for="lfo1-rate-mode">Rate mode</label>
           <select id="lfo1-rate-mode" data-param="lfo1RateMode">
@@ -314,6 +314,7 @@
           </select>
 
           <label for="lfo1-depth">Depth</label>
+          <output id="lfo1-depth-value">0.00</output>
           <input
             id="lfo1-depth"
             data-param="lfo1Depth"
@@ -323,7 +324,6 @@
             step="0.01"
             value="0.00"
           />
-          <output id="lfo1-depth-value">0.00</output>
         </fieldset>
       </section>
 
@@ -348,6 +348,7 @@
           </select>
 
           <label for="lfo2-rate">Rate (Hz)</label>
+          <output id="lfo2-rate-value">0.50</output>
           <input
             id="lfo2-rate"
             data-param="lfo2Rate"
@@ -357,7 +358,6 @@
             step="0.01"
             value="0.50"
           />
-          <output id="lfo2-rate-value">0.50</output>
 
           <label for="lfo2-rate-mode">Rate mode</label>
           <select id="lfo2-rate-mode" data-param="lfo2RateMode">
@@ -382,6 +382,7 @@
           </select>
 
           <label for="lfo2-depth">Depth</label>
+          <output id="lfo2-depth-value">0.00</output>
           <input
             id="lfo2-depth"
             data-param="lfo2Depth"
@@ -391,7 +392,6 @@
             step="0.01"
             value="0.00"
           />
-          <output id="lfo2-depth-value">0.00</output>
         </fieldset>
       </section>
 
@@ -399,6 +399,7 @@
         <h2>Master</h2>
         <fieldset>
           <label for="master-volume">Volume</label>
+          <output id="master-volume-value">0.60</output>
           <input
             id="master-volume"
             data-param="masterVolume"
@@ -408,7 +409,6 @@
             step="0.01"
             value="0.60"
           />
-          <output id="master-volume-value">0.60</output>
         </fieldset>
       </section>
 
@@ -416,6 +416,7 @@
         <h2>Effects</h2>
         <fieldset>
           <label for="fx-delay-time">Delay Time</label>
+          <output id="fx-delay-time-value">32</output>
           <input
             id="fx-delay-time"
             data-param="fxDelayTime"
@@ -425,9 +426,9 @@
             step="1"
             value="32"
           />
-          <output id="fx-delay-time-value">32</output>
 
           <label for="fx-delay-feedback">Delay Feedback</label>
+          <output id="fx-delay-feedback-value">22</output>
           <input
             id="fx-delay-feedback"
             data-param="fxDelayFeedback"
@@ -437,9 +438,9 @@
             step="1"
             value="22"
           />
-          <output id="fx-delay-feedback-value">22</output>
 
           <label for="fx-delay-mix">Delay Mix</label>
+          <output id="fx-delay-mix-value">12</output>
           <input
             id="fx-delay-mix"
             data-param="fxDelayMix"
@@ -449,9 +450,9 @@
             step="1"
             value="12"
           />
-          <output id="fx-delay-mix-value">12</output>
 
           <label for="fx-chorus-rate">Chorus Rate</label>
+          <output id="fx-chorus-rate-value">26</output>
           <input
             id="fx-chorus-rate"
             data-param="fxChorusRate"
@@ -461,9 +462,9 @@
             step="1"
             value="26"
           />
-          <output id="fx-chorus-rate-value">26</output>
 
           <label for="fx-chorus-depth">Chorus Depth</label>
+          <output id="fx-chorus-depth-value">18</output>
           <input
             id="fx-chorus-depth"
             data-param="fxChorusDepth"
@@ -473,9 +474,9 @@
             step="1"
             value="18"
           />
-          <output id="fx-chorus-depth-value">18</output>
 
           <label for="fx-chorus-mix">Chorus Mix</label>
+          <output id="fx-chorus-mix-value">10</output>
           <input
             id="fx-chorus-mix"
             data-param="fxChorusMix"
@@ -485,9 +486,9 @@
             step="1"
             value="10"
           />
-          <output id="fx-chorus-mix-value">10</output>
 
           <label for="fx-reverb-size">Reverb Size</label>
+          <output id="fx-reverb-size-value">36</output>
           <input
             id="fx-reverb-size"
             data-param="fxReverbSize"
@@ -497,9 +498,9 @@
             step="1"
             value="36"
           />
-          <output id="fx-reverb-size-value">36</output>
 
           <label for="fx-reverb-mix">Reverb Mix</label>
+          <output id="fx-reverb-mix-value">14</output>
           <input
             id="fx-reverb-mix"
             data-param="fxReverbMix"
@@ -509,9 +510,9 @@
             step="1"
             value="14"
           />
-          <output id="fx-reverb-mix-value">14</output>
 
           <label for="fx-dist-drive">Distortion Drive</label>
+          <output id="fx-dist-drive-value">8</output>
           <input
             id="fx-dist-drive"
             data-param="fxDistDrive"
@@ -521,9 +522,9 @@
             step="1"
             value="8"
           />
-          <output id="fx-dist-drive-value">8</output>
 
           <label for="fx-dist-mix">Distortion Mix</label>
+          <output id="fx-dist-mix-value">6</output>
           <input
             id="fx-dist-mix"
             data-param="fxDistMix"
@@ -533,7 +534,6 @@
             step="1"
             value="6"
           />
-          <output id="fx-dist-mix-value">6</output>
         </fieldset>
       </section>
     </main>
