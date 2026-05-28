@@ -1,5 +1,5 @@
 const MIDI_CC_MAP = {
-  1: { name: "Mod Wheel", target: "reserved" },
+  1: { name: "Mod Wheel", target: "lfo1Depth" },
   2: { name: "Breath Controller", target: "filterQ" },
   7: { name: "Channel Volume", target: "masterVolume" },
   10: { name: "Pan", target: "reserved" },
@@ -16,8 +16,26 @@ const MIDI_CC_MAP = {
   73: { name: "Attack Time", target: "attack" },
   74: { name: "Brightness", target: "filterCutoff" },
   75: { name: "Decay Time", target: "decay" },
+  76: { name: "Vibrato Rate", target: "lfo1Rate" },
+  77: { name: "Vibrato Depth", target: "lfo1Depth" },
+  78: { name: "Vibrato Delay", target: "reserved" },
   120: { name: "All Sound Off", target: "allSoundOff" },
   123: { name: "All Notes Off", target: "allNotesOff" },
+};
+
+const LFO_DIVISION_BEATS = {
+  "1/1": 4,
+  "1/2": 2,
+  "1/4": 1,
+  "1/8": 0.5,
+  "1/16": 0.25,
+  "1/32": 0.125,
+  "1/4T": 2 / 3,
+  "1/8T": 1 / 3,
+  "1/16T": 1 / 6,
+  "1/4.": 1.5,
+  "1/8.": 0.75,
+  "1/16.": 0.375,
 };
 
 const PARAM_CONFIG = {
@@ -33,6 +51,10 @@ const PARAM_CONFIG = {
   decay: { min: 0.001, max: 2, step: 0.001, digits: 3 },
   sustain: { min: 0, max: 1, step: 0.01, digits: 2 },
   release: { min: 0.01, max: 4, step: 0.01, digits: 2 },
+  lfo1Rate: { min: 0.01, max: 20, step: 0.01, digits: 2 },
+  lfo1Depth: { min: 0, max: 1, step: 0.01, digits: 2 },
+  lfo2Rate: { min: 0.01, max: 20, step: 0.01, digits: 2 },
+  lfo2Depth: { min: 0, max: 1, step: 0.01, digits: 2 },
   masterVolume: { min: 0, max: 1, step: 0.01, digits: 2 },
 };
 
@@ -51,6 +73,18 @@ const params = {
   decay: 0.2,
   sustain: 0.7,
   release: 0.4,
+  lfo1Wave: "sine",
+  lfo1Target: "off",
+  lfo1Rate: 4,
+  lfo1Depth: 0,
+  lfo1RateMode: "free",
+  lfo1Division: "1/4",
+  lfo2Wave: "triangle",
+  lfo2Target: "off",
+  lfo2Rate: 0.5,
+  lfo2Depth: 0,
+  lfo2RateMode: "free",
+  lfo2Division: "1/4",
   masterVolume: 0.6,
 };
 
@@ -62,6 +96,14 @@ class Synth {
     this.outputLimiter = null;
     this.filter = null;
     this.voices = new Map();
+    this.lfoState = {
+      lfo1: { osc: null, gain: null, target: "off", depth: 0 },
+      lfo2: { osc: null, gain: null, target: "off", depth: 0 },
+    };
+    this.midiClockBpm = null;
+    this.midiClockRunning = false;
+    this.midiClockTickTimes = [];
+    this.lastClockTickAt = 0;
     this.expression = 1;
     this.sustainPedalDown = false;
     this.sustainedVoiceIds = new Set();
@@ -96,6 +138,8 @@ class Synth {
     this.filter.connect(this.masterGain);
     this.masterGain.connect(this.outputLimiter);
     this.outputLimiter.connect(this.audioContext.destination);
+
+    this.initLfos();
 
     if (this.audioContext.state === "suspended") {
       await this.audioContext.resume();
@@ -135,7 +179,215 @@ class Synth {
 
     if (name.startsWith("osc")) {
       this.voices.forEach((voice) => this.applyOscParamsToVoice(voice));
+      this.refreshLfoRouting();
+      return;
     }
+
+    if (name.startsWith("lfo")) {
+      this.updateLfoFromParams(name.slice(0, 4));
+    }
+  }
+
+  initLfos() {
+    this.createLfo("lfo1");
+    this.createLfo("lfo2");
+    this.updateLfoFromParams("lfo1");
+    this.updateLfoFromParams("lfo2");
+  }
+
+  createLfo(lfoId) {
+    const osc = this.audioContext.createOscillator();
+    const gain = this.audioContext.createGain();
+    gain.gain.value = 0;
+    osc.connect(gain);
+    osc.start();
+
+    this.lfoState[lfoId].osc = osc;
+    this.lfoState[lfoId].gain = gain;
+  }
+
+  updateLfoFromParams(lfoId) {
+    if (!this.audioContext) {
+      return;
+    }
+
+    const lfo = this.lfoState[lfoId];
+    if (!lfo || !lfo.osc || !lfo.gain) {
+      return;
+    }
+
+    const wave = this.params[`${lfoId}Wave`];
+    const rate = this.params[`${lfoId}Rate`];
+    const rateMode = this.params[`${lfoId}RateMode`];
+    const division = this.params[`${lfoId}Division`];
+    const depth = this.params[`${lfoId}Depth`];
+    const target = this.params[`${lfoId}Target`];
+    const now = this.audioContext.currentTime;
+
+    lfo.osc.type = wave;
+    lfo.osc.frequency.setTargetAtTime(this.resolveLfoRate(rateMode, rate, division), now, 0.01);
+    lfo.depth = depth;
+    lfo.target = target;
+
+    const shouldMove = rateMode !== "sync" || this.midiClockRunning;
+    const targetDepth = shouldMove ? this.getLfoDepthForTarget(target, depth) : 0;
+    lfo.gain.gain.setTargetAtTime(targetDepth, now, 0.01);
+
+    this.routeLfo(lfoId);
+  }
+
+  resolveLfoRate(rateMode, freeRate, division) {
+    if (rateMode !== "sync") {
+      return freeRate;
+    }
+
+    if (!this.midiClockBpm) {
+      return freeRate;
+    }
+
+    const beats = LFO_DIVISION_BEATS[division] || 1;
+    return this.midiClockBpm / (60 * beats);
+  }
+
+  getLfoDepthForTarget(target, depth) {
+    if (target === "pitch") {
+      return depth * 100;
+    }
+    if (target === "filterCutoff") {
+      return depth * 4000;
+    }
+    if (target === "osc1Level" || target === "osc2Level") {
+      return depth * 0.5;
+    }
+    return 0;
+  }
+
+  disconnectLfo(lfoId) {
+    const lfo = this.lfoState[lfoId];
+    if (!lfo || !lfo.gain) {
+      return;
+    }
+    try {
+      lfo.gain.disconnect();
+    } catch (_error) {
+    }
+  }
+
+  routeLfo(lfoId) {
+    const lfo = this.lfoState[lfoId];
+    if (!lfo || !lfo.gain) {
+      return;
+    }
+
+    this.disconnectLfo(lfoId);
+
+    if (lfo.target === "off") {
+      return;
+    }
+
+    if (lfo.target === "filterCutoff") {
+      lfo.gain.connect(this.filter.frequency);
+      return;
+    }
+
+    this.voices.forEach((voice) => {
+      this.connectLfoToVoice(lfoId, voice);
+    });
+  }
+
+  connectLfoToVoice(lfoId, voice) {
+    const lfo = this.lfoState[lfoId];
+    if (!lfo || !lfo.gain) {
+      return;
+    }
+
+    if (lfo.target === "pitch") {
+      lfo.gain.connect(voice.osc1.detune);
+      lfo.gain.connect(voice.osc2.detune);
+      return;
+    }
+
+    if (lfo.target === "osc1Level") {
+      lfo.gain.connect(voice.osc1Gain.gain);
+      return;
+    }
+
+    if (lfo.target === "osc2Level") {
+      lfo.gain.connect(voice.osc2Gain.gain);
+    }
+  }
+
+  refreshLfoRouting() {
+    this.routeLfo("lfo1");
+    this.routeLfo("lfo2");
+  }
+
+  setMidiClockBpm(bpm) {
+    this.midiClockBpm = bpm;
+    this.updateLfoFromParams("lfo1");
+    this.updateLfoFromParams("lfo2");
+  }
+
+  setSyncedLfoMovementRunning(isRunning) {
+    this.midiClockRunning = isRunning;
+    const now = this.audioContext ? this.audioContext.currentTime : 0;
+
+    ["lfo1", "lfo2"].forEach((lfoId) => {
+      if (this.params[`${lfoId}RateMode`] !== "sync") {
+        return;
+      }
+
+      const lfo = this.lfoState[lfoId];
+      if (!lfo || !lfo.gain) {
+        return;
+      }
+
+      const depth = this.getLfoDepthForTarget(lfo.target, lfo.depth);
+      lfo.gain.gain.cancelScheduledValues(now);
+      lfo.gain.gain.setTargetAtTime(isRunning ? depth : 0, now, 0.01);
+    });
+  }
+
+  restartSyncedLfoPhase() {
+    if (!this.audioContext) {
+      return;
+    }
+
+    ["lfo1", "lfo2"].forEach((lfoId) => {
+      if (this.params[`${lfoId}RateMode`] !== "sync") {
+        return;
+      }
+
+      const lfo = this.lfoState[lfoId];
+      if (!lfo || !lfo.osc || !lfo.gain) {
+        return;
+      }
+
+      try {
+        lfo.osc.stop();
+      } catch (_error) {
+      }
+      try {
+        lfo.osc.disconnect();
+      } catch (_error) {
+      }
+
+      const osc = this.audioContext.createOscillator();
+      osc.type = this.params[`${lfoId}Wave`];
+      osc.frequency.setValueAtTime(
+        this.resolveLfoRate(
+          this.params[`${lfoId}RateMode`],
+          this.params[`${lfoId}Rate`],
+          this.params[`${lfoId}Division`]
+        ),
+        this.audioContext.currentTime
+      );
+      osc.connect(lfo.gain);
+      osc.start();
+      lfo.osc = osc;
+
+      this.routeLfo(lfoId);
+    });
   }
 
   updateMasterGain() {
@@ -222,6 +474,8 @@ class Synth {
     };
 
     this.voices.set(voiceId, voice);
+    this.connectLfoToVoice("lfo1", voice);
+    this.connectLfoToVoice("lfo2", voice);
   }
 
   applyOscillatorStartParams(osc1, osc2, note, now) {
@@ -372,6 +626,7 @@ function formatParamValue(paramName, value) {
 
 const synth = new Synth({ ...params });
 const midiStatus = document.getElementById("midi-status");
+const midiClockStatus = document.getElementById("midi-clock-status");
 const audioStatus = document.getElementById("audio-status");
 const startAudioButton = document.getElementById("start-audio");
 const midiChannelSelect = document.getElementById("midi-channel");
@@ -398,6 +653,14 @@ const TARGET_LABELS = {
   osc2Detune: "Osc 2 detune",
   osc1Octave: "Osc 1 octave",
   osc2Octave: "Osc 2 octave",
+  lfo1Rate: "LFO 1 rate",
+  lfo1Depth: "LFO 1 depth",
+  lfo2Rate: "LFO 2 rate",
+  lfo2Depth: "LFO 2 depth",
+  lfo1RateMode: "LFO 1 rate mode",
+  lfo2RateMode: "LFO 2 rate mode",
+  lfo1Division: "LFO 1 division",
+  lfo2Division: "LFO 2 division",
 };
 
 function bindControls() {
@@ -421,6 +684,8 @@ function bindControls() {
       updateParamFromUI(paramName, value);
     });
   });
+
+  updateLfoUiState();
 }
 
 function updateParamFromUI(paramName, value) {
@@ -432,6 +697,26 @@ function updateParamFromUI(paramName, value) {
   if (output && typeof normalized === "number") {
     output.textContent = formatParamValue(paramName, normalized);
   }
+
+  if (paramName.startsWith("lfo")) {
+    updateLfoUiState();
+  }
+}
+
+function updateLfoUiState() {
+  ["lfo1", "lfo2"].forEach((lfoId) => {
+    const rateInput = inputByParam[`${lfoId}Rate`];
+    const divisionInput = inputByParam[`${lfoId}Division`];
+    const rateMode = params[`${lfoId}RateMode`];
+    const isSync = rateMode === "sync";
+
+    if (rateInput) {
+      rateInput.disabled = isSync;
+    }
+    if (divisionInput) {
+      divisionInput.disabled = !isSync;
+    }
+  });
 }
 
 function syncControl(paramName, value) {
@@ -482,8 +767,73 @@ async function handleStartAudio() {
   }
 }
 
+function updateMidiClockStatus() {
+  if (!midiClockStatus) {
+    return;
+  }
+
+  if (!synth.midiClockBpm) {
+    midiClockStatus.textContent = "MIDI Clock: waiting";
+    return;
+  }
+
+  const state = synth.midiClockRunning ? "running" : "stopped";
+  midiClockStatus.textContent = `MIDI Clock: ${synth.midiClockBpm.toFixed(1)} BPM (${state})`;
+}
+
+function handleMidiRealtime(status) {
+  if (status === 0xf8) {
+    const nowMs = performance.now();
+    if (synth.lastClockTickAt > 0) {
+      const delta = nowMs - synth.lastClockTickAt;
+      if (delta > 0 && delta < 1000) {
+        synth.midiClockTickTimes.push(delta);
+        if (synth.midiClockTickTimes.length > 96) {
+          synth.midiClockTickTimes.shift();
+        }
+      }
+    }
+    synth.lastClockTickAt = nowMs;
+
+    if (synth.midiClockTickTimes.length >= 12) {
+      const avgMsPerTick =
+        synth.midiClockTickTimes.reduce((sum, value) => sum + value, 0) /
+        synth.midiClockTickTimes.length;
+      const bpm = 60000 / (avgMsPerTick * 24);
+      synth.setMidiClockBpm(Math.max(20, Math.min(300, bpm)));
+      updateMidiClockStatus();
+    }
+    return true;
+  }
+
+  if (status === 0xfa) {
+    synth.setSyncedLfoMovementRunning(true);
+    synth.restartSyncedLfoPhase();
+    updateMidiClockStatus();
+    return true;
+  }
+
+  if (status === 0xfb) {
+    synth.setSyncedLfoMovementRunning(true);
+    updateMidiClockStatus();
+    return true;
+  }
+
+  if (status === 0xfc) {
+    synth.setSyncedLfoMovementRunning(false);
+    updateMidiClockStatus();
+    return true;
+  }
+
+  return false;
+}
+
 function handleMidiMessage(event) {
   const [status, data1, data2] = event.data;
+  if (handleMidiRealtime(status)) {
+    return;
+  }
+
   const command = status & 0xf0;
   const channel = (status & 0x0f) + 1;
   const voiceId = `${channel}:${data1}`;
@@ -541,6 +891,14 @@ function handleMidiMessage(event) {
     }
 
     if (ccConfig.target === "reserved") {
+      return;
+    }
+
+    if (ccConfig.target === "lfo1Rate" && params.lfo1RateMode === "sync") {
+      return;
+    }
+
+    if (ccConfig.target === "lfo2Rate" && params.lfo2RateMode === "sync") {
       return;
     }
 

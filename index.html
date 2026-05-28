@@ -39,6 +39,7 @@
           </select>
         </div>
         <p id="midi-status">MIDI: checking...</p>
+        <p id="midi-clock-status">MIDI Clock: waiting</p>
       </section>
 
       <section class="panel">
@@ -138,6 +139,110 @@
           <label for="env-release">Release (s)</label>
           <input id="env-release" data-param="release" type="range" min="0.01" max="4" step="0.01" value="0.4">
           <output id="env-release-value">0.40</output>
+        </fieldset>
+      </section>
+
+      <section class="panel">
+        <h2>LFO 1</h2>
+        <fieldset>
+          <label for="lfo1-wave">Waveform</label>
+          <select id="lfo1-wave" data-param="lfo1Wave">
+            <option value="sine" selected>Sine</option>
+            <option value="triangle">Triangle</option>
+            <option value="sawtooth">Sawtooth</option>
+            <option value="square">Square</option>
+          </select>
+
+          <label for="lfo1-target">Target</label>
+          <select id="lfo1-target" data-param="lfo1Target">
+            <option value="off" selected>Off</option>
+            <option value="pitch">Pitch</option>
+            <option value="filterCutoff">Filter cutoff</option>
+            <option value="osc1Level">Osc 1 level</option>
+            <option value="osc2Level">Osc 2 level</option>
+          </select>
+
+          <label for="lfo1-rate">Rate (Hz)</label>
+          <input id="lfo1-rate" data-param="lfo1Rate" type="range" min="0.01" max="20" step="0.01" value="4.00">
+          <output id="lfo1-rate-value">4.00</output>
+
+          <label for="lfo1-rate-mode">Rate mode</label>
+          <select id="lfo1-rate-mode" data-param="lfo1RateMode">
+            <option value="free" selected>Free</option>
+            <option value="sync">Sync</option>
+          </select>
+
+          <label for="lfo1-division">Division</label>
+          <select id="lfo1-division" data-param="lfo1Division">
+            <option value="1/1">1/1</option>
+            <option value="1/2">1/2</option>
+            <option value="1/4" selected>1/4</option>
+            <option value="1/8">1/8</option>
+            <option value="1/16">1/16</option>
+            <option value="1/32">1/32</option>
+            <option value="1/4T">1/4T</option>
+            <option value="1/8T">1/8T</option>
+            <option value="1/16T">1/16T</option>
+            <option value="1/4.">1/4.</option>
+            <option value="1/8.">1/8.</option>
+            <option value="1/16.">1/16.</option>
+          </select>
+
+          <label for="lfo1-depth">Depth</label>
+          <input id="lfo1-depth" data-param="lfo1Depth" type="range" min="0" max="1" step="0.01" value="0.00">
+          <output id="lfo1-depth-value">0.00</output>
+        </fieldset>
+      </section>
+
+      <section class="panel">
+        <h2>LFO 2</h2>
+        <fieldset>
+          <label for="lfo2-wave">Waveform</label>
+          <select id="lfo2-wave" data-param="lfo2Wave">
+            <option value="sine">Sine</option>
+            <option value="triangle" selected>Triangle</option>
+            <option value="sawtooth">Sawtooth</option>
+            <option value="square">Square</option>
+          </select>
+
+          <label for="lfo2-target">Target</label>
+          <select id="lfo2-target" data-param="lfo2Target">
+            <option value="off" selected>Off</option>
+            <option value="pitch">Pitch</option>
+            <option value="filterCutoff">Filter cutoff</option>
+            <option value="osc1Level">Osc 1 level</option>
+            <option value="osc2Level">Osc 2 level</option>
+          </select>
+
+          <label for="lfo2-rate">Rate (Hz)</label>
+          <input id="lfo2-rate" data-param="lfo2Rate" type="range" min="0.01" max="20" step="0.01" value="0.50">
+          <output id="lfo2-rate-value">0.50</output>
+
+          <label for="lfo2-rate-mode">Rate mode</label>
+          <select id="lfo2-rate-mode" data-param="lfo2RateMode">
+            <option value="free" selected>Free</option>
+            <option value="sync">Sync</option>
+          </select>
+
+          <label for="lfo2-division">Division</label>
+          <select id="lfo2-division" data-param="lfo2Division">
+            <option value="1/1">1/1</option>
+            <option value="1/2">1/2</option>
+            <option value="1/4" selected>1/4</option>
+            <option value="1/8">1/8</option>
+            <option value="1/16">1/16</option>
+            <option value="1/32">1/32</option>
+            <option value="1/4T">1/4T</option>
+            <option value="1/8T">1/8T</option>
+            <option value="1/16T">1/16T</option>
+            <option value="1/4.">1/4.</option>
+            <option value="1/8.">1/8.</option>
+            <option value="1/16.">1/16.</option>
+          </select>
+
+          <label for="lfo2-depth">Depth</label>
+          <input id="lfo2-depth" data-param="lfo2Depth" type="range" min="0" max="1" step="0.01" value="0.00">
+          <output id="lfo2-depth-value">0.00</output>
         </fieldset>
       </section>
 
