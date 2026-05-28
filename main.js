@@ -102,6 +102,7 @@ class Synth {
     };
     this.midiClockBpm = null;
     this.midiClockRunning = false;
+    this.midiClockStopped = false;
     this.midiClockTickTimes = [];
     this.lastClockTickAt = 0;
     this.expression = 1;
@@ -324,8 +325,30 @@ class Synth {
 
   setMidiClockBpm(bpm) {
     this.midiClockBpm = bpm;
-    this.updateLfoFromParams("lfo1");
-    this.updateLfoFromParams("lfo2");
+    this.updateSyncedLfoRates();
+  }
+
+  updateSyncedLfoRates() {
+    if (!this.audioContext) {
+      return;
+    }
+
+    const now = this.audioContext.currentTime;
+    ["lfo1", "lfo2"].forEach((lfoId) => {
+      if (this.params[`${lfoId}RateMode`] !== "sync") {
+        return;
+      }
+      const lfo = this.lfoState[lfoId];
+      if (!lfo || !lfo.osc) {
+        return;
+      }
+      const rate = this.resolveLfoRate(
+        this.params[`${lfoId}RateMode`],
+        this.params[`${lfoId}Rate`],
+        this.params[`${lfoId}Division`]
+      );
+      lfo.osc.frequency.setTargetAtTime(rate, now, 0.01);
+    });
   }
 
   setSyncedLfoMovementRunning(isRunning) {
@@ -801,12 +824,18 @@ function handleMidiRealtime(status) {
         synth.midiClockTickTimes.length;
       const bpm = 60000 / (avgMsPerTick * 24);
       synth.setMidiClockBpm(Math.max(20, Math.min(300, bpm)));
+      if (!synth.midiClockStopped && !synth.midiClockRunning) {
+        synth.setSyncedLfoMovementRunning(true);
+      }
       updateMidiClockStatus();
     }
     return true;
   }
 
   if (status === 0xfa) {
+    synth.midiClockStopped = false;
+    synth.midiClockTickTimes = [];
+    synth.lastClockTickAt = 0;
     synth.setSyncedLfoMovementRunning(true);
     synth.restartSyncedLfoPhase();
     updateMidiClockStatus();
@@ -814,12 +843,16 @@ function handleMidiRealtime(status) {
   }
 
   if (status === 0xfb) {
+    synth.midiClockStopped = false;
+    synth.midiClockTickTimes = [];
+    synth.lastClockTickAt = 0;
     synth.setSyncedLfoMovementRunning(true);
     updateMidiClockStatus();
     return true;
   }
 
   if (status === 0xfc) {
+    synth.midiClockStopped = true;
     synth.setSyncedLfoMovementRunning(false);
     updateMidiClockStatus();
     return true;
