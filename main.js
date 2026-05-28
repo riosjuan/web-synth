@@ -51,7 +51,7 @@ const params = {
   decay: 0.2,
   sustain: 0.7,
   release: 0.4,
-  masterVolume: 0.75,
+  masterVolume: 0.6,
 };
 
 class Synth {
@@ -59,6 +59,7 @@ class Synth {
     this.params = initialParams;
     this.audioContext = null;
     this.masterGain = null;
+    this.outputLimiter = null;
     this.filter = null;
     this.voices = new Map();
     this.expression = 1;
@@ -80,13 +81,21 @@ class Synth {
     this.masterGain = this.audioContext.createGain();
     this.masterGain.gain.value = this.params.masterVolume * this.expression;
 
+    this.outputLimiter = this.audioContext.createDynamicsCompressor();
+    this.outputLimiter.threshold.setValueAtTime(-12, this.audioContext.currentTime);
+    this.outputLimiter.knee.setValueAtTime(18, this.audioContext.currentTime);
+    this.outputLimiter.ratio.setValueAtTime(6, this.audioContext.currentTime);
+    this.outputLimiter.attack.setValueAtTime(0.003, this.audioContext.currentTime);
+    this.outputLimiter.release.setValueAtTime(0.12, this.audioContext.currentTime);
+
     this.filter = this.audioContext.createBiquadFilter();
     this.filter.type = "lowpass";
     this.filter.frequency.value = this.params.filterCutoff;
     this.filter.Q.value = this.params.filterQ;
 
     this.filter.connect(this.masterGain);
-    this.masterGain.connect(this.audioContext.destination);
+    this.masterGain.connect(this.outputLimiter);
+    this.outputLimiter.connect(this.audioContext.destination);
 
     if (this.audioContext.state === "suspended") {
       await this.audioContext.resume();
@@ -187,7 +196,7 @@ class Synth {
     osc2Gain.connect(amp);
     amp.connect(this.filter);
 
-    const peak = velocityGain;
+    const peak = velocityGain * 0.45;
     const sustainLevel = peak * this.params.sustain;
     const attackEnd = now + this.params.attack;
     const decayEnd = attackEnd + this.params.decay;
@@ -363,13 +372,33 @@ function formatParamValue(paramName, value) {
 
 const synth = new Synth({ ...params });
 const midiStatus = document.getElementById("midi-status");
-const midiActivity = document.getElementById("midi-activity");
 const audioStatus = document.getElementById("audio-status");
 const startAudioButton = document.getElementById("start-audio");
 const midiChannelSelect = document.getElementById("midi-channel");
+const ccMapBody = document.getElementById("cc-map-body");
 const inputByParam = {};
 const outputByParam = {};
 let selectedMidiChannel = "all";
+
+const TARGET_LABELS = {
+  reserved: "Reserved",
+  expression: "Expression",
+  sustainPedal: "Sustain pedal",
+  allSoundOff: "All sound off",
+  allNotesOff: "All notes off",
+  masterVolume: "Master volume",
+  filterQ: "Filter resonance",
+  filterCutoff: "Filter cutoff",
+  attack: "Attack",
+  decay: "Decay",
+  release: "Release",
+  osc1Level: "Osc 1 level",
+  osc2Level: "Osc 2 level",
+  osc1Detune: "Osc 1 detune",
+  osc2Detune: "Osc 2 detune",
+  osc1Octave: "Osc 1 octave",
+  osc2Octave: "Osc 2 octave",
+};
 
 function bindControls() {
   const controls = document.querySelectorAll("[data-param]");
@@ -415,6 +444,34 @@ function syncControl(paramName, value) {
   updateParamFromUI(paramName, typeof value === "number" ? value : input.value);
 }
 
+function buildCcMapTable() {
+  if (!ccMapBody) {
+    return;
+  }
+
+  const rows = Object.entries(MIDI_CC_MAP)
+    .map(([cc, config]) => ({ cc: Number(cc), ...config }))
+    .sort((a, b) => a.cc - b.cc);
+
+  ccMapBody.innerHTML = "";
+
+  rows.forEach((row) => {
+    const tr = document.createElement("tr");
+    const ccCell = document.createElement("td");
+    const nameCell = document.createElement("td");
+    const targetCell = document.createElement("td");
+
+    ccCell.textContent = String(row.cc);
+    nameCell.textContent = row.name;
+    targetCell.textContent = TARGET_LABELS[row.target] || row.target;
+
+    tr.appendChild(ccCell);
+    tr.appendChild(nameCell);
+    tr.appendChild(targetCell);
+    ccMapBody.appendChild(tr);
+  });
+}
+
 async function handleStartAudio() {
   try {
     await synth.init();
@@ -434,7 +491,6 @@ function handleMidiMessage(event) {
     selectedMidiChannel === "all" || channel === Number(selectedMidiChannel);
 
   if (command === 0x90) {
-    midiActivity.textContent = `MIDI activity: note ${data1}, velocity ${data2}, channel ${channel}`;
     if (!isSelectedChannel) {
       return;
     }
@@ -447,7 +503,6 @@ function handleMidiMessage(event) {
   }
 
   if (command === 0x80) {
-    midiActivity.textContent = `MIDI activity: note off ${data1}, channel ${channel}`;
     if (!isSelectedChannel) {
       return;
     }
@@ -457,9 +512,6 @@ function handleMidiMessage(event) {
 
   if (command === 0xb0) {
     const ccConfig = MIDI_CC_MAP[data1];
-    const ccName = ccConfig ? ccConfig.name : "Unmapped";
-    const ccTarget = ccConfig ? ccConfig.target : "unmapped";
-    midiActivity.textContent = `MIDI activity: CC ${data1} ${ccName}, value ${data2}, channel ${channel} -> ${ccTarget}`;
     if (!isSelectedChannel) {
       return;
     }
@@ -539,6 +591,7 @@ async function initMidi() {
 
 function init() {
   bindControls();
+  buildCcMapTable();
   initMidi();
 
   midiChannelSelect.addEventListener("change", () => {

@@ -48,6 +48,29 @@ h2 {
   flex-wrap: wrap;
 }
 
+.table-wrap {
+  border: 1px solid #111;
+  overflow: auto;
+}
+
+.cc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.cc-table th,
+.cc-table td {
+  border: 1px solid #111;
+  padding: 0.3rem 0.45rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.cc-table th {
+  font-weight: 600;
+}
+
 fieldset {
   border: 1px solid #111;
   margin: 0;
