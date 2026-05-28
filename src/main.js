@@ -7,6 +7,13 @@ import { createControlBinder } from "./ui.js";
 const params = { ...DEFAULT_PARAMS };
 const synth = new Synth(params);
 
+const MIDI_REALTIME = {
+  CLOCK_TICK: 0xf8,
+  START: 0xfa,
+  CONTINUE: 0xfb,
+  STOP: 0xfc,
+};
+
 const midiStatus = document.getElementById("midi-status");
 const midiClockStatus = document.getElementById("midi-clock-status");
 const audioStatus = document.getElementById("audio-status");
@@ -29,59 +36,59 @@ async function handleStartAudio() {
   }
 }
 
-function updateMidiClockStatus() {
-  if (!synth.midiClockBpm) {
-    midiClockStatus.textContent = "MIDI Clock: waiting";
+function updateClockStatusText() {
+  if (!synth.clockBpm) {
+    midiClockStatus.textContent = "Clock: waiting for ticks";
     return;
   }
-  const state = synth.midiClockRunning ? "running" : "stopped";
-  midiClockStatus.textContent = `MIDI Clock: ${synth.midiClockBpm.toFixed(1)} BPM (${state})`;
+  const state = synth.isClockRunning ? "playing" : "stopped";
+  midiClockStatus.textContent = `Clock: ${synth.clockBpm.toFixed(1)} BPM (${state})`;
 }
 
-function handleMidiRealtime(status) {
-  if (status === 0xf8) {
+function handleMidiRealtimeStatus(status) {
+  if (status === MIDI_REALTIME.CLOCK_TICK) {
     const nowMs = performance.now();
-    if (synth.lastClockTickAt > 0) {
-      const delta = nowMs - synth.lastClockTickAt;
-      if (delta > 0 && delta < 1000) {
-        synth.midiClockTickTimes.push(delta);
-        if (synth.midiClockTickTimes.length > 96) synth.midiClockTickTimes.shift();
+    if (synth.lastClockTickMs > 0) {
+      const tickDeltaMs = nowMs - synth.lastClockTickMs;
+      if (tickDeltaMs > 0 && tickDeltaMs < 1000) {
+        synth.clockTickIntervalsMs.push(tickDeltaMs);
+        if (synth.clockTickIntervalsMs.length > 96) synth.clockTickIntervalsMs.shift();
       }
     }
-    synth.lastClockTickAt = nowMs;
-    if (synth.midiClockTickTimes.length >= 12) {
-      const avgMsPerTick = synth.midiClockTickTimes.reduce((sum, value) => sum + value, 0) /
-        synth.midiClockTickTimes.length;
+    synth.lastClockTickMs = nowMs;
+    if (synth.clockTickIntervalsMs.length >= 12) {
+      const avgMsPerTick = synth.clockTickIntervalsMs.reduce((sum, value) => sum + value, 0) /
+        synth.clockTickIntervalsMs.length;
       const bpm = 60000 / (avgMsPerTick * 24);
-      synth.setMidiClockBpm(Math.max(20, Math.min(300, bpm)));
-      if (!synth.midiClockStopped && !synth.midiClockRunning) {
-        synth.setSyncedLfoMovementRunning(true);
+      synth.setClockBpm(Math.max(20, Math.min(300, bpm)));
+      if (!synth.isClockExplicitlyStopped && !synth.isClockRunning) {
+        synth.setSyncedLfoMotionEnabled(true);
       }
-      updateMidiClockStatus();
+      updateClockStatusText();
     }
     return true;
   }
-  if (status === 0xfa) {
-    synth.midiClockStopped = false;
-    synth.midiClockTickTimes = [];
-    synth.lastClockTickAt = 0;
-    synth.setSyncedLfoMovementRunning(true);
+  if (status === MIDI_REALTIME.START) {
+    synth.isClockExplicitlyStopped = false;
+    synth.clockTickIntervalsMs = [];
+    synth.lastClockTickMs = 0;
+    synth.setSyncedLfoMotionEnabled(true);
     synth.restartSyncedLfoPhase();
-    updateMidiClockStatus();
+    updateClockStatusText();
     return true;
   }
-  if (status === 0xfb) {
-    synth.midiClockStopped = false;
-    synth.midiClockTickTimes = [];
-    synth.lastClockTickAt = 0;
-    synth.setSyncedLfoMovementRunning(true);
-    updateMidiClockStatus();
+  if (status === MIDI_REALTIME.CONTINUE) {
+    synth.isClockExplicitlyStopped = false;
+    synth.clockTickIntervalsMs = [];
+    synth.lastClockTickMs = 0;
+    synth.setSyncedLfoMotionEnabled(true);
+    updateClockStatusText();
     return true;
   }
-  if (status === 0xfc) {
-    synth.midiClockStopped = true;
-    synth.setSyncedLfoMovementRunning(false);
-    updateMidiClockStatus();
+  if (status === MIDI_REALTIME.STOP) {
+    synth.isClockExplicitlyStopped = true;
+    synth.setSyncedLfoMotionEnabled(false);
+    updateClockStatusText();
     return true;
   }
   return false;
@@ -89,7 +96,7 @@ function handleMidiRealtime(status) {
 
 function handleMidiMessage(event) {
   const [status, data1, data2] = event.data;
-  if (handleMidiRealtime(status)) return;
+  if (handleMidiRealtimeStatus(status)) return;
 
   const command = status & 0xf0;
   const channel = (status & 0x0f) + 1;

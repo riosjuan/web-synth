@@ -42,11 +42,11 @@ export class Synth {
       lfo1: { osc: null, gain: null, target: "off", depth: 0 },
       lfo2: { osc: null, gain: null, target: "off", depth: 0 },
     };
-    this.midiClockBpm = null;
-    this.midiClockRunning = false;
-    this.midiClockStopped = false;
-    this.midiClockTickTimes = [];
-    this.lastClockTickAt = 0;
+    this.clockBpm = null;
+    this.isClockRunning = false;
+    this.isClockExplicitlyStopped = false;
+    this.clockTickIntervalsMs = [];
+    this.lastClockTickMs = 0;
     this.expression = 1;
     this.sustainPedalDown = false;
     this.sustainedVoiceIds = new Set();
@@ -211,19 +211,19 @@ export class Synth {
     lfo.osc.type = wave;
     lfo.osc.frequency.setTargetAtTime(this.resolveLfoRate(rateMode, rate, division), now, 0.01);
     lfo.depth = depth; lfo.target = target;
-    const shouldMove = rateMode !== "sync" || this.midiClockRunning;
+    const shouldMove = rateMode !== "sync" || this.isClockRunning;
     lfo.gain.gain.setTargetAtTime(shouldMove ? this.getLfoDepthForTarget(target, depth) : 0, now, 0.01);
     this.routeLfo(lfoId);
   }
-  resolveLfoRate(rateMode, freeRate, division) { if (rateMode !== "sync") return freeRate; if (!this.midiClockBpm) return freeRate; const beats = LFO_DIVISION_BEATS[division] || 1; return this.midiClockBpm / (60 * beats); }
+  resolveLfoRate(rateMode, freeRate, division) { if (rateMode !== "sync") return freeRate; if (!this.clockBpm) return freeRate; const beats = LFO_DIVISION_BEATS[division] || 1; return this.clockBpm / (60 * beats); }
   getLfoDepthForTarget(target, depth) { if (target === "pitch") return depth * 100; if (target === "filterCutoff") return depth * 4000; if (target === "osc1Level" || target === "osc2Level") return depth * 0.5; return 0; }
   disconnectLfo(lfoId) { const lfo = this.lfoState[lfoId]; if (!lfo || !lfo.gain) return; try { lfo.gain.disconnect(); } catch (_e) {} }
   routeLfo(lfoId) { const lfo = this.lfoState[lfoId]; if (!lfo || !lfo.gain) return; this.disconnectLfo(lfoId); if (lfo.target === "off") return; if (lfo.target === "filterCutoff") { lfo.gain.connect(this.filter.frequency); return; } this.voices.forEach((voice) => this.connectLfoToVoice(lfoId, voice)); }
   connectLfoToVoice(lfoId, voice) { const lfo = this.lfoState[lfoId]; if (!lfo || !lfo.gain) return; if (lfo.target === "pitch") { lfo.gain.connect(voice.osc1.detune); lfo.gain.connect(voice.osc2.detune); return; } if (lfo.target === "osc1Level") { lfo.gain.connect(voice.osc1Gain.gain); return; } if (lfo.target === "osc2Level") lfo.gain.connect(voice.osc2Gain.gain); }
   refreshLfoRouting() { this.routeLfo("lfo1"); this.routeLfo("lfo2"); }
-  setMidiClockBpm(bpm) { this.midiClockBpm = bpm; this.updateSyncedLfoRates(); }
+  setClockBpm(bpm) { this.clockBpm = bpm; this.updateSyncedLfoRates(); }
   updateSyncedLfoRates() { if (!this.audioContext) return; const now = this.audioContext.currentTime; ["lfo1", "lfo2"].forEach((lfoId) => { if (this.params[`${lfoId}RateMode`] !== "sync") return; const lfo = this.lfoState[lfoId]; if (!lfo || !lfo.osc) return; const rate = this.resolveLfoRate(this.params[`${lfoId}RateMode`], this.params[`${lfoId}Rate`], this.params[`${lfoId}Division`]); lfo.osc.frequency.setTargetAtTime(rate, now, 0.01); }); }
-  setSyncedLfoMovementRunning(isRunning) { this.midiClockRunning = isRunning; const now = this.audioContext ? this.audioContext.currentTime : 0; ["lfo1", "lfo2"].forEach((lfoId) => { if (this.params[`${lfoId}RateMode`] !== "sync") return; const lfo = this.lfoState[lfoId]; if (!lfo || !lfo.gain) return; const depth = this.getLfoDepthForTarget(lfo.target, lfo.depth); lfo.gain.gain.cancelScheduledValues(now); lfo.gain.gain.setTargetAtTime(isRunning ? depth : 0, now, 0.01); }); }
+  setSyncedLfoMotionEnabled(isRunning) { this.isClockRunning = isRunning; const now = this.audioContext ? this.audioContext.currentTime : 0; ["lfo1", "lfo2"].forEach((lfoId) => { if (this.params[`${lfoId}RateMode`] !== "sync") return; const lfo = this.lfoState[lfoId]; if (!lfo || !lfo.gain) return; const depth = this.getLfoDepthForTarget(lfo.target, lfo.depth); lfo.gain.gain.cancelScheduledValues(now); lfo.gain.gain.setTargetAtTime(isRunning ? depth : 0, now, 0.01); }); }
   restartSyncedLfoPhase() { if (!this.audioContext) return; ["lfo1", "lfo2"].forEach((lfoId) => { if (this.params[`${lfoId}RateMode`] !== "sync") return; const lfo = this.lfoState[lfoId]; if (!lfo || !lfo.osc || !lfo.gain) return; try { lfo.osc.stop(); } catch (_e) {} try { lfo.osc.disconnect(); } catch (_e) {} const osc = this.audioContext.createOscillator(); osc.type = this.params[`${lfoId}Wave`]; osc.frequency.setValueAtTime(this.resolveLfoRate(this.params[`${lfoId}RateMode`], this.params[`${lfoId}Rate`], this.params[`${lfoId}Division`]), this.audioContext.currentTime); osc.connect(lfo.gain); osc.start(); lfo.osc = osc; this.routeLfo(lfoId); }); }
   updateMasterGain() { if (!this.audioContext || !this.masterGain) return; const now = this.audioContext.currentTime; this.masterGain.gain.setTargetAtTime(this.params.masterVolume * this.expression, now, 0.01); }
   setExpressionFromCC(ccValue) { this.expression = Math.max(0, Math.min(1, ccValue / 127)); this.updateMasterGain(); }
