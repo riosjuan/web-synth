@@ -45,12 +45,12 @@ const PARAM_CONFIG = {
   osc2Detune: { min: -50, max: 50, step: 1, digits: 0 },
   osc1Level: { min: 0, max: 1, step: 0.01, digits: 2 },
   osc2Level: { min: 0, max: 1, step: 0.01, digits: 2 },
-  filterCutoff: { min: 80, max: 12000, step: 1, digits: 0 },
-  filterQ: { min: 0.1, max: 20, step: 0.1, digits: 1 },
-  attack: { min: 0.001, max: 2, step: 0.001, digits: 3 },
-  decay: { min: 0.001, max: 2, step: 0.001, digits: 3 },
-  sustain: { min: 0, max: 1, step: 0.01, digits: 2 },
-  release: { min: 0.01, max: 4, step: 0.01, digits: 2 },
+  filterCutoff: { min: 0, max: 127, step: 1, digits: 0 },
+  filterQ: { min: 0, max: 127, step: 1, digits: 0 },
+  attack: { min: 0, max: 127, step: 1, digits: 0 },
+  decay: { min: 0, max: 127, step: 1, digits: 0 },
+  sustain: { min: 0, max: 127, step: 1, digits: 0 },
+  release: { min: 0, max: 127, step: 1, digits: 0 },
   lfo1Rate: { min: 0.01, max: 20, step: 0.01, digits: 2 },
   lfo1Depth: { min: 0, max: 1, step: 0.01, digits: 2 },
   lfo2Rate: { min: 0.01, max: 20, step: 0.01, digits: 2 },
@@ -67,12 +67,12 @@ const params = {
   osc2Octave: 0,
   osc2Detune: 0,
   osc2Level: 0.5,
-  filterCutoff: 6000,
-  filterQ: 0.8,
-  attack: 0.02,
-  decay: 0.2,
-  sustain: 0.7,
-  release: 0.4,
+  filterCutoff: 109,
+  filterQ: 4,
+  attack: 1,
+  decay: 13,
+  sustain: 89,
+  release: 12,
   lfo1Wave: "sine",
   lfo1Target: "off",
   lfo1Rate: 4,
@@ -133,8 +133,8 @@ class Synth {
 
     this.filter = this.audioContext.createBiquadFilter();
     this.filter.type = "lowpass";
-    this.filter.frequency.value = this.params.filterCutoff;
-    this.filter.Q.value = this.params.filterQ;
+    this.filter.frequency.value = cutoffControlToHz(this.params.filterCutoff);
+    this.filter.Q.value = resonanceControlToQ(this.params.filterQ);
 
     this.filter.connect(this.masterGain);
     this.masterGain.connect(this.outputLimiter);
@@ -162,12 +162,12 @@ class Synth {
     }
 
     if (name === "filterCutoff") {
-      this.filter.frequency.setTargetAtTime(value, now, 0.01);
+      this.filter.frequency.setTargetAtTime(cutoffControlToHz(value), now, 0.01);
       return;
     }
 
     if (name === "filterQ") {
-      this.filter.Q.setTargetAtTime(value, now, 0.01);
+      this.filter.Q.setTargetAtTime(resonanceControlToQ(value), now, 0.01);
       return;
     }
 
@@ -472,9 +472,9 @@ class Synth {
     amp.connect(this.filter);
 
     const peak = velocityGain * 0.45;
-    const sustainLevel = peak * this.params.sustain;
-    const attackEnd = now + this.params.attack;
-    const decayEnd = attackEnd + this.params.decay;
+    const sustainLevel = peak * sustainControlToLevel(this.params.sustain);
+    const attackEnd = now + envelopeControlToSeconds(this.params.attack, 0.001, 2);
+    const decayEnd = attackEnd + envelopeControlToSeconds(this.params.decay, 0.001, 2);
 
     amp.gain.cancelScheduledValues(now);
     amp.gain.setValueAtTime(0, now);
@@ -536,7 +536,8 @@ class Synth {
     voice.released = true;
 
     const now = this.audioContext.currentTime;
-    const releaseEnd = now + this.params.release;
+    const releaseSeconds = envelopeControlToSeconds(this.params.release, 0.01, 4);
+    const releaseEnd = now + releaseSeconds;
 
     if (typeof voice.amp.gain.cancelAndHoldAtTime === "function") {
       voice.amp.gain.cancelAndHoldAtTime(now);
@@ -558,7 +559,7 @@ class Synth {
       if (this.voices.get(voiceId) === voice) {
         this.voices.delete(voiceId);
       }
-    }, Math.ceil((this.params.release + 0.05) * 1000));
+    }, Math.ceil((releaseSeconds + 0.05) * 1000));
   }
 
   allNotesOff() {
@@ -626,9 +627,7 @@ function ccValueToParam(paramName, ccValue) {
 
   const ratio = ccValue / 127;
   if (paramName === "filterCutoff") {
-    const minLog = Math.log(config.min);
-    const maxLog = Math.log(config.max);
-    return Math.round(Math.exp(minLog + ratio * (maxLog - minLog)));
+    return Math.round(config.min + ratio * (config.max - config.min));
   }
 
   const raw = config.min + ratio * (config.max - config.min);
@@ -645,6 +644,31 @@ function formatParamValue(paramName, value) {
     return String(value);
   }
   return Number(value).toFixed(config.digits);
+}
+
+function cutoffControlToHz(value) {
+  const minHz = 80;
+  const maxHz = 12000;
+  const normalized = Math.max(0, Math.min(127, value)) / 127;
+  const minLog = Math.log(minHz);
+  const maxLog = Math.log(maxHz);
+  return Math.exp(minLog + normalized * (maxLog - minLog));
+}
+
+function resonanceControlToQ(value) {
+  const minQ = 0.1;
+  const maxQ = 20;
+  const normalized = Math.max(0, Math.min(127, value)) / 127;
+  return minQ + normalized * (maxQ - minQ);
+}
+
+function envelopeControlToSeconds(value, minSeconds, maxSeconds) {
+  const normalized = Math.max(0, Math.min(127, value)) / 127;
+  return minSeconds + normalized * (maxSeconds - minSeconds);
+}
+
+function sustainControlToLevel(value) {
+  return Math.max(0, Math.min(127, value)) / 127;
 }
 
 const synth = new Synth({ ...params });
@@ -694,7 +718,15 @@ function bindControls() {
       return;
     }
 
-    inputByParam[paramName] = el;
+    if (el.type === "radio") {
+      if (!Array.isArray(inputByParam[paramName])) {
+        inputByParam[paramName] = [];
+      }
+      inputByParam[paramName].push(el);
+    } else {
+      inputByParam[paramName] = el;
+    }
+
     const output = document.getElementById(`${el.id}-value`);
     if (output) {
       outputByParam[paramName] = output;
@@ -703,7 +735,8 @@ function bindControls() {
 
     el.addEventListener("input", () => {
       const isSelect = el.tagName.toLowerCase() === "select";
-      const value = isSelect ? el.value : Number(el.value);
+      const isRadio = el.type === "radio";
+      const value = isSelect || isRadio ? el.value : Number(el.value);
       updateParamFromUI(paramName, value);
     });
   });
@@ -745,6 +778,14 @@ function updateLfoUiState() {
 function syncControl(paramName, value) {
   const input = inputByParam[paramName];
   if (!input) {
+    return;
+  }
+
+  if (Array.isArray(input)) {
+    input.forEach((radio) => {
+      radio.checked = radio.value === String(value);
+    });
+    updateParamFromUI(paramName, String(value));
     return;
   }
 

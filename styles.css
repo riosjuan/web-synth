@@ -76,8 +76,9 @@ fieldset {
   margin: 0;
   padding: 0.5rem;
   display: grid;
-  grid-template-columns: minmax(120px, 160px) 1fr auto;
-  gap: 0.45rem 0.5rem;
+  grid-template-columns: 1fr auto;
+  column-gap: 0.5rem;
+  row-gap: 0.2rem;
   align-items: center;
 }
 
@@ -89,9 +90,37 @@ output {
   font: inherit;
 }
 
+fieldset > label {
+  display: block;
+  grid-column: 1 / -1;
+}
+
+fieldset > input,
+fieldset > select {
+  grid-column: 1;
+  width: 100%;
+}
+
+.radio-row {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.radio-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 output {
+  grid-column: 2;
   min-width: 3.5rem;
-  text-align: right;
+  text-align: left;
+  padding-left: 0;
+  margin-top: 0;
+  margin-bottom: 0.3rem;
 }
 
 button {
@@ -109,9 +138,5 @@ button:active {
 @media (max-width: 620px) {
   fieldset {
     grid-template-columns: 1fr;
-  }
-
-  output {
-    text-align: left;
   }
 }
