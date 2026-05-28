@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Web Synth</title>
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <section class="topbar">
@@ -48,24 +48,65 @@
       <section class="panel">
         <h2>Oscillator 1</h2>
         <fieldset>
-          <label>Waveform</label>
           <div class="radio-row">
-            <label><input type="radio" name="osc1-wave" data-param="osc1Wave" value="sine"> Sine</label>
-            <label><input type="radio" name="osc1-wave" data-param="osc1Wave" value="triangle" checked> Triangle</label>
-            <label><input type="radio" name="osc1-wave" data-param="osc1Wave" value="sawtooth"> Sawtooth</label>
-            <label><input type="radio" name="osc1-wave" data-param="osc1Wave" value="square"> Square</label>
+            <label
+              ><input type="radio" name="osc1-wave" data-param="osc1Wave" value="sine" />
+              Sine</label
+            >
+            <label
+              ><input
+                type="radio"
+                name="osc1-wave"
+                data-param="osc1Wave"
+                value="triangle"
+                checked
+              />
+              Triangle</label
+            >
+            <label
+              ><input type="radio" name="osc1-wave" data-param="osc1Wave" value="sawtooth" />
+              Sawtooth</label
+            >
+            <label
+              ><input type="radio" name="osc1-wave" data-param="osc1Wave" value="square" />
+              Square</label
+            >
           </div>
 
           <label for="osc1-octave">Octave</label>
-          <input id="osc1-octave" data-param="osc1Octave" type="range" min="-2" max="2" step="1" value="0">
+          <input
+            id="osc1-octave"
+            data-param="osc1Octave"
+            type="range"
+            min="-2"
+            max="2"
+            step="1"
+            value="0"
+          />
           <output id="osc1-octave-value">0</output>
 
           <label for="osc1-detune">Detune (cents)</label>
-          <input id="osc1-detune" data-param="osc1Detune" type="range" min="-50" max="50" step="1" value="0">
+          <input
+            id="osc1-detune"
+            data-param="osc1Detune"
+            type="range"
+            min="-50"
+            max="50"
+            step="1"
+            value="0"
+          />
           <output id="osc1-detune-value">0</output>
 
           <label for="osc1-level">Level</label>
-          <input id="osc1-level" data-param="osc1Level" type="range" min="0" max="1" step="0.01" value="0.5">
+          <input
+            id="osc1-level"
+            data-param="osc1Level"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0.5"
+          />
           <output id="osc1-level-value">0.50</output>
         </fieldset>
       </section>
@@ -73,24 +114,65 @@
       <section class="panel">
         <h2>Oscillator 2</h2>
         <fieldset>
-          <label>Waveform</label>
           <div class="radio-row">
-            <label><input type="radio" name="osc2-wave" data-param="osc2Wave" value="sine"> Sine</label>
-            <label><input type="radio" name="osc2-wave" data-param="osc2Wave" value="triangle"> Triangle</label>
-            <label><input type="radio" name="osc2-wave" data-param="osc2Wave" value="sawtooth" checked> Sawtooth</label>
-            <label><input type="radio" name="osc2-wave" data-param="osc2Wave" value="square"> Square</label>
+            <label
+              ><input type="radio" name="osc2-wave" data-param="osc2Wave" value="sine" />
+              Sine</label
+            >
+            <label
+              ><input type="radio" name="osc2-wave" data-param="osc2Wave" value="triangle" />
+              Triangle</label
+            >
+            <label
+              ><input
+                type="radio"
+                name="osc2-wave"
+                data-param="osc2Wave"
+                value="sawtooth"
+                checked
+              />
+              Sawtooth</label
+            >
+            <label
+              ><input type="radio" name="osc2-wave" data-param="osc2Wave" value="square" />
+              Square</label
+            >
           </div>
 
           <label for="osc2-octave">Octave</label>
-          <input id="osc2-octave" data-param="osc2Octave" type="range" min="-2" max="2" step="1" value="0">
+          <input
+            id="osc2-octave"
+            data-param="osc2Octave"
+            type="range"
+            min="-2"
+            max="2"
+            step="1"
+            value="0"
+          />
           <output id="osc2-octave-value">0</output>
 
           <label for="osc2-detune">Detune (cents)</label>
-          <input id="osc2-detune" data-param="osc2Detune" type="range" min="-50" max="50" step="1" value="0">
+          <input
+            id="osc2-detune"
+            data-param="osc2Detune"
+            type="range"
+            min="-50"
+            max="50"
+            step="1"
+            value="0"
+          />
           <output id="osc2-detune-value">0</output>
 
           <label for="osc2-level">Level</label>
-          <input id="osc2-level" data-param="osc2Level" type="range" min="0" max="1" step="0.01" value="0.5">
+          <input
+            id="osc2-level"
+            data-param="osc2Level"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0.5"
+          />
           <output id="osc2-level-value">0.50</output>
         </fieldset>
       </section>
@@ -99,11 +181,27 @@
         <h2>Filter</h2>
         <fieldset>
           <label for="filter-cutoff">Cutoff</label>
-          <input id="filter-cutoff" data-param="filterCutoff" type="range" min="0" max="127" step="1" value="109">
+          <input
+            id="filter-cutoff"
+            data-param="filterCutoff"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="109"
+          />
           <output id="filter-cutoff-value">109</output>
 
           <label for="filter-q">Resonance</label>
-          <input id="filter-q" data-param="filterQ" type="range" min="0" max="127" step="1" value="4">
+          <input
+            id="filter-q"
+            data-param="filterQ"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="4"
+          />
           <output id="filter-q-value">4</output>
         </fieldset>
       </section>
@@ -112,19 +210,51 @@
         <h2>Envelope</h2>
         <fieldset>
           <label for="env-attack">Attack (s)</label>
-          <input id="env-attack" data-param="attack" type="range" min="0" max="127" step="1" value="1">
+          <input
+            id="env-attack"
+            data-param="attack"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="1"
+          />
           <output id="env-attack-value">1</output>
 
           <label for="env-decay">Decay (s)</label>
-          <input id="env-decay" data-param="decay" type="range" min="0" max="127" step="1" value="13">
+          <input
+            id="env-decay"
+            data-param="decay"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="13"
+          />
           <output id="env-decay-value">13</output>
 
           <label for="env-sustain">Sustain</label>
-          <input id="env-sustain" data-param="sustain" type="range" min="0" max="127" step="1" value="89">
+          <input
+            id="env-sustain"
+            data-param="sustain"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="89"
+          />
           <output id="env-sustain-value">89</output>
 
           <label for="env-release">Release (s)</label>
-          <input id="env-release" data-param="release" type="range" min="0" max="127" step="1" value="12">
+          <input
+            id="env-release"
+            data-param="release"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="12"
+          />
           <output id="env-release-value">12</output>
         </fieldset>
       </section>
@@ -150,7 +280,15 @@
           </select>
 
           <label for="lfo1-rate">Rate (Hz)</label>
-          <input id="lfo1-rate" data-param="lfo1Rate" type="range" min="0.01" max="20" step="0.01" value="4.00">
+          <input
+            id="lfo1-rate"
+            data-param="lfo1Rate"
+            type="range"
+            min="0.01"
+            max="20"
+            step="0.01"
+            value="4.00"
+          />
           <output id="lfo1-rate-value">4.00</output>
 
           <label for="lfo1-rate-mode">Rate mode</label>
@@ -176,7 +314,15 @@
           </select>
 
           <label for="lfo1-depth">Depth</label>
-          <input id="lfo1-depth" data-param="lfo1Depth" type="range" min="0" max="1" step="0.01" value="0.00">
+          <input
+            id="lfo1-depth"
+            data-param="lfo1Depth"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0.00"
+          />
           <output id="lfo1-depth-value">0.00</output>
         </fieldset>
       </section>
@@ -202,7 +348,15 @@
           </select>
 
           <label for="lfo2-rate">Rate (Hz)</label>
-          <input id="lfo2-rate" data-param="lfo2Rate" type="range" min="0.01" max="20" step="0.01" value="0.50">
+          <input
+            id="lfo2-rate"
+            data-param="lfo2Rate"
+            type="range"
+            min="0.01"
+            max="20"
+            step="0.01"
+            value="0.50"
+          />
           <output id="lfo2-rate-value">0.50</output>
 
           <label for="lfo2-rate-mode">Rate mode</label>
@@ -228,7 +382,15 @@
           </select>
 
           <label for="lfo2-depth">Depth</label>
-          <input id="lfo2-depth" data-param="lfo2Depth" type="range" min="0" max="1" step="0.01" value="0.00">
+          <input
+            id="lfo2-depth"
+            data-param="lfo2Depth"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0.00"
+          />
           <output id="lfo2-depth-value">0.00</output>
         </fieldset>
       </section>
@@ -237,7 +399,15 @@
         <h2>Master</h2>
         <fieldset>
           <label for="master-volume">Volume</label>
-          <input id="master-volume" data-param="masterVolume" type="range" min="0" max="1" step="0.01" value="0.60">
+          <input
+            id="master-volume"
+            data-param="masterVolume"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0.60"
+          />
           <output id="master-volume-value">0.60</output>
         </fieldset>
       </section>
@@ -246,54 +416,133 @@
         <h2>Effects</h2>
         <fieldset>
           <label for="fx-delay-time">Delay Time</label>
-          <input id="fx-delay-time" data-param="fxDelayTime" type="range" min="0" max="127" step="1" value="32">
+          <input
+            id="fx-delay-time"
+            data-param="fxDelayTime"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="32"
+          />
           <output id="fx-delay-time-value">32</output>
 
           <label for="fx-delay-feedback">Delay Feedback</label>
-          <input id="fx-delay-feedback" data-param="fxDelayFeedback" type="range" min="0" max="127" step="1" value="22">
+          <input
+            id="fx-delay-feedback"
+            data-param="fxDelayFeedback"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="22"
+          />
           <output id="fx-delay-feedback-value">22</output>
 
           <label for="fx-delay-mix">Delay Mix</label>
-          <input id="fx-delay-mix" data-param="fxDelayMix" type="range" min="0" max="127" step="1" value="12">
+          <input
+            id="fx-delay-mix"
+            data-param="fxDelayMix"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="12"
+          />
           <output id="fx-delay-mix-value">12</output>
 
           <label for="fx-chorus-rate">Chorus Rate</label>
-          <input id="fx-chorus-rate" data-param="fxChorusRate" type="range" min="0" max="127" step="1" value="26">
+          <input
+            id="fx-chorus-rate"
+            data-param="fxChorusRate"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="26"
+          />
           <output id="fx-chorus-rate-value">26</output>
 
           <label for="fx-chorus-depth">Chorus Depth</label>
-          <input id="fx-chorus-depth" data-param="fxChorusDepth" type="range" min="0" max="127" step="1" value="18">
+          <input
+            id="fx-chorus-depth"
+            data-param="fxChorusDepth"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="18"
+          />
           <output id="fx-chorus-depth-value">18</output>
 
           <label for="fx-chorus-mix">Chorus Mix</label>
-          <input id="fx-chorus-mix" data-param="fxChorusMix" type="range" min="0" max="127" step="1" value="10">
+          <input
+            id="fx-chorus-mix"
+            data-param="fxChorusMix"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="10"
+          />
           <output id="fx-chorus-mix-value">10</output>
 
           <label for="fx-reverb-size">Reverb Size</label>
-          <input id="fx-reverb-size" data-param="fxReverbSize" type="range" min="0" max="127" step="1" value="36">
+          <input
+            id="fx-reverb-size"
+            data-param="fxReverbSize"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="36"
+          />
           <output id="fx-reverb-size-value">36</output>
 
           <label for="fx-reverb-mix">Reverb Mix</label>
-          <input id="fx-reverb-mix" data-param="fxReverbMix" type="range" min="0" max="127" step="1" value="14">
+          <input
+            id="fx-reverb-mix"
+            data-param="fxReverbMix"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="14"
+          />
           <output id="fx-reverb-mix-value">14</output>
 
           <label for="fx-dist-drive">Distortion Drive</label>
-          <input id="fx-dist-drive" data-param="fxDistDrive" type="range" min="0" max="127" step="1" value="8">
+          <input
+            id="fx-dist-drive"
+            data-param="fxDistDrive"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="8"
+          />
           <output id="fx-dist-drive-value">8</output>
 
           <label for="fx-dist-mix">Distortion Mix</label>
-          <input id="fx-dist-mix" data-param="fxDistMix" type="range" min="0" max="127" step="1" value="6">
+          <input
+            id="fx-dist-mix"
+            data-param="fxDistMix"
+            type="range"
+            min="0"
+            max="127"
+            step="1"
+            value="6"
+          />
           <output id="fx-dist-mix-value">6</output>
         </fieldset>
       </section>
-
     </main>
 
     <section id="cc-map-dialog" class="cc-dialog" aria-hidden="true">
       <div class="cc-dialog-panel" role="dialog" aria-modal="true" aria-label="MIDI CC Map">
         <div class="dialog-header">
-        <h2>MIDI CC Map</h2>
-        <button id="close-cc-map" type="button">Close</button>
+          <h2>MIDI CC Map</h2>
+          <button id="close-cc-map" type="button">Close</button>
         </div>
         <div class="table-wrap">
           <table class="cc-table" aria-label="MIDI CC mapping table">
