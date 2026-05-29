@@ -137,6 +137,14 @@ fieldset>select {
   width: 100%;
 }
 
+.control-group {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  grid-column: 1 / -1;
+  display: block;
+}
+
 .wave-group {
   grid-column: 1 / -1;
   display: grid;
@@ -165,6 +173,67 @@ fieldset>select {
 
 .wave-group .wave-option:first-of-type {
   border-left: 0;
+}
+
+.segment-group {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0;
+  border: 1px solid #111;
+}
+
+.segment-group input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segment-option {
+  border: 0;
+  border-left: 1px solid #111;
+  background: #fff;
+  color: #111;
+  min-height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.segment-group .segment-option:first-of-type {
+  border-left: 0;
+}
+
+.segment-group input[type="radio"]:checked + .segment-option {
+  background: #111;
+  color: #fff;
+}
+
+.segment-group input[type="radio"]:focus-visible + .segment-option {
+  outline: 2px solid #111;
+  outline-offset: 1px;
+}
+
+.detune-wrap {
+  grid-column: 1 / -1;
+  position: relative;
+}
+
+.detune-wrap::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 0.8rem;
+  background: #111;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.detune-wrap input[type="range"] {
+  width: 100%;
 }
 
 .wave-option svg {
