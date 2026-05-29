@@ -137,17 +137,69 @@ fieldset>select {
   width: 100%;
 }
 
-.radio-row {
+.wave-group {
   grid-column: 1 / -1;
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  border: 1px solid #111;
 }
 
-.radio-row label {
-  display: inline-flex;
+.wave-group input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wave-option {
+  border: 0;
+  border-left: 1px solid #111;
+  background: #fff;
+  color: #111;
+  min-height: 2.1rem;
+  display: flex;
   align-items: center;
-  gap: 0.25rem;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.wave-group .wave-option:first-of-type {
+  border-left: 0;
+}
+
+.wave-option svg {
+  width: 1.35rem;
+  height: 1.1rem;
+}
+
+.wave-option path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wave-group input[type="radio"]:checked + .wave-option {
+  background: #111;
+  color: #fff;
+}
+
+.wave-group input[type="radio"]:focus-visible + .wave-option {
+  outline: 2px solid #111;
+  outline-offset: 1px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 output {

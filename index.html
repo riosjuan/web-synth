@@ -48,29 +48,34 @@
       <section class="panel">
         <h2>Oscillator 1</h2>
         <fieldset>
-          <div class="radio-row">
-            <label
-              ><input type="radio" name="osc1-wave" data-param="osc1Wave" value="sine" />
-              Sine</label
-            >
-            <label
-              ><input
-                type="radio"
-                name="osc1-wave"
-                data-param="osc1Wave"
-                value="triangle"
-                checked
-              />
-              Triangle</label
-            >
-            <label
-              ><input type="radio" name="osc1-wave" data-param="osc1Wave" value="sawtooth" />
-              Sawtooth</label
-            >
-            <label
-              ><input type="radio" name="osc1-wave" data-param="osc1Wave" value="square" />
-              Square</label
-            >
+          <div class="wave-group" role="radiogroup" aria-label="Oscillator 1 waveform">
+            <input id="osc1-wave-sine" type="radio" name="osc1-wave" data-param="osc1Wave" value="sine" />
+            <label class="wave-option" for="osc1-wave-sine">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12c3.5 0 3.5-8 7-8s3.5 16 7 16 3.5-8 7-8" /></svg>
+              <span class="sr-only">Sine waveform</span>
+            </label>
+            <input
+              id="osc1-wave-triangle"
+              type="radio"
+              name="osc1-wave"
+              data-param="osc1Wave"
+              value="triangle"
+              checked
+            />
+            <label class="wave-option" for="osc1-wave-triangle">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20 12 4 22 20" /></svg>
+              <span class="sr-only">Triangle waveform</span>
+            </label>
+            <input id="osc1-wave-sawtooth" type="radio" name="osc1-wave" data-param="osc1Wave" value="sawtooth" />
+            <label class="wave-option" for="osc1-wave-sawtooth">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 20 8 4v16L16 4v16L23 4" /></svg>
+              <span class="sr-only">Sawtooth waveform</span>
+            </label>
+            <input id="osc1-wave-square" type="radio" name="osc1-wave" data-param="osc1Wave" value="square" />
+            <label class="wave-option" for="osc1-wave-square">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 20V4h11v16h11" /></svg>
+              <span class="sr-only">Square waveform</span>
+            </label>
           </div>
 
           <label for="osc1-octave">Octave</label>
@@ -114,29 +119,34 @@
       <section class="panel">
         <h2>Oscillator 2</h2>
         <fieldset>
-          <div class="radio-row">
-            <label
-              ><input type="radio" name="osc2-wave" data-param="osc2Wave" value="sine" />
-              Sine</label
-            >
-            <label
-              ><input type="radio" name="osc2-wave" data-param="osc2Wave" value="triangle" />
-              Triangle</label
-            >
-            <label
-              ><input
-                type="radio"
-                name="osc2-wave"
-                data-param="osc2Wave"
-                value="sawtooth"
-                checked
-              />
-              Sawtooth</label
-            >
-            <label
-              ><input type="radio" name="osc2-wave" data-param="osc2Wave" value="square" />
-              Square</label
-            >
+          <div class="wave-group" role="radiogroup" aria-label="Oscillator 2 waveform">
+            <input id="osc2-wave-sine" type="radio" name="osc2-wave" data-param="osc2Wave" value="sine" />
+            <label class="wave-option" for="osc2-wave-sine">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12c3.5 0 3.5-8 7-8s3.5 16 7 16 3.5-8 7-8" /></svg>
+              <span class="sr-only">Sine waveform</span>
+            </label>
+            <input id="osc2-wave-triangle" type="radio" name="osc2-wave" data-param="osc2Wave" value="triangle" />
+            <label class="wave-option" for="osc2-wave-triangle">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20 12 4 22 20" /></svg>
+              <span class="sr-only">Triangle waveform</span>
+            </label>
+            <input
+              id="osc2-wave-sawtooth"
+              type="radio"
+              name="osc2-wave"
+              data-param="osc2Wave"
+              value="sawtooth"
+              checked
+            />
+            <label class="wave-option" for="osc2-wave-sawtooth">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 20 8 4v16L16 4v16L23 4" /></svg>
+              <span class="sr-only">Sawtooth waveform</span>
+            </label>
+            <input id="osc2-wave-square" type="radio" name="osc2-wave" data-param="osc2Wave" value="square" />
+            <label class="wave-option" for="osc2-wave-square">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 20V4h11v16h11" /></svg>
+              <span class="sr-only">Square waveform</span>
+            </label>
           </div>
 
           <label for="osc2-octave">Octave</label>
@@ -290,13 +300,29 @@
       <section class="panel">
         <h2>LFO 1</h2>
         <fieldset>
-          <label for="lfo1-wave">Waveform</label>
-          <select id="lfo1-wave" data-param="lfo1Wave">
-            <option value="sine" selected>Sine</option>
-            <option value="triangle">Triangle</option>
-            <option value="sawtooth">Sawtooth</option>
-            <option value="square">Square</option>
-          </select>
+          <label>Waveform</label>
+          <div class="wave-group" role="radiogroup" aria-label="LFO 1 waveform">
+            <input id="lfo1-wave-sine" type="radio" name="lfo1-wave" data-param="lfo1Wave" value="sine" checked />
+            <label class="wave-option" for="lfo1-wave-sine">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12c3.5 0 3.5-8 7-8s3.5 16 7 16 3.5-8 7-8" /></svg>
+              <span class="sr-only">Sine waveform</span>
+            </label>
+            <input id="lfo1-wave-triangle" type="radio" name="lfo1-wave" data-param="lfo1Wave" value="triangle" />
+            <label class="wave-option" for="lfo1-wave-triangle">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20 12 4 22 20" /></svg>
+              <span class="sr-only">Triangle waveform</span>
+            </label>
+            <input id="lfo1-wave-sawtooth" type="radio" name="lfo1-wave" data-param="lfo1Wave" value="sawtooth" />
+            <label class="wave-option" for="lfo1-wave-sawtooth">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 20 8 4v16L16 4v16L23 4" /></svg>
+              <span class="sr-only">Sawtooth waveform</span>
+            </label>
+            <input id="lfo1-wave-square" type="radio" name="lfo1-wave" data-param="lfo1Wave" value="square" />
+            <label class="wave-option" for="lfo1-wave-square">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 20V4h11v16h11" /></svg>
+              <span class="sr-only">Square waveform</span>
+            </label>
+          </div>
 
           <label for="lfo1-target">Target</label>
           <select id="lfo1-target" data-param="lfo1Target">
@@ -358,13 +384,29 @@
       <section class="panel">
         <h2>LFO 2</h2>
         <fieldset>
-          <label for="lfo2-wave">Waveform</label>
-          <select id="lfo2-wave" data-param="lfo2Wave">
-            <option value="sine">Sine</option>
-            <option value="triangle" selected>Triangle</option>
-            <option value="sawtooth">Sawtooth</option>
-            <option value="square">Square</option>
-          </select>
+          <label>Waveform</label>
+          <div class="wave-group" role="radiogroup" aria-label="LFO 2 waveform">
+            <input id="lfo2-wave-sine" type="radio" name="lfo2-wave" data-param="lfo2Wave" value="sine" />
+            <label class="wave-option" for="lfo2-wave-sine">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12c3.5 0 3.5-8 7-8s3.5 16 7 16 3.5-8 7-8" /></svg>
+              <span class="sr-only">Sine waveform</span>
+            </label>
+            <input id="lfo2-wave-triangle" type="radio" name="lfo2-wave" data-param="lfo2Wave" value="triangle" checked />
+            <label class="wave-option" for="lfo2-wave-triangle">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20 12 4 22 20" /></svg>
+              <span class="sr-only">Triangle waveform</span>
+            </label>
+            <input id="lfo2-wave-sawtooth" type="radio" name="lfo2-wave" data-param="lfo2Wave" value="sawtooth" />
+            <label class="wave-option" for="lfo2-wave-sawtooth">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 20 8 4v16L16 4v16L23 4" /></svg>
+              <span class="sr-only">Sawtooth waveform</span>
+            </label>
+            <input id="lfo2-wave-square" type="radio" name="lfo2-wave" data-param="lfo2Wave" value="square" />
+            <label class="wave-option" for="lfo2-wave-square">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 20V4h11v16h11" /></svg>
+              <span class="sr-only">Square waveform</span>
+            </label>
+          </div>
 
           <label for="lfo2-target">Target</label>
           <select id="lfo2-target" data-param="lfo2Target">
