@@ -43,7 +43,7 @@ h2 {
 
 .panel {
   border: 1px solid #111;
-  padding: 0.75rem;
+  padding: 0.5rem;
   display: grid;
   gap: 0.5rem;
 }
@@ -110,11 +110,11 @@ h2 {
 fieldset {
   border: 1px solid #111;
   margin: 0;
-  padding: 0.5rem;
+  padding: 0.4rem;
   display: grid;
   grid-template-columns: 1fr auto;
   column-gap: 0.5rem;
-  row-gap: 0.2rem;
+  row-gap: 0.15rem;
   align-items: center;
 }
 
@@ -147,7 +147,163 @@ fieldset>select {
 
 .control-group > legend {
   padding: 0;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.12rem;
+  font-size: 0.95rem;
+}
+
+.osc-layout {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 62px;
+  gap: 0.35rem;
+  align-items: stretch;
+}
+
+.osc-main {
+  grid-column: 1;
+  min-width: 0;
+  display: grid;
+  gap: 0.1rem;
+  align-content: start;
+}
+
+.osc-main > output {
+  grid-column: 1;
+  justify-self: end;
+}
+
+.detune-head {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 0.05rem;
+  margin-bottom: 0.08rem;
+}
+
+.detune-head > label {
+  margin: 0;
+}
+
+.detune-head > output {
+  min-width: 2.5rem;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+}
+
+.osc-main .wave-group,
+.osc-main .segment-group,
+.osc-main .detune-wrap {
+  width: 100%;
+}
+
+.osc-level {
+  grid-column: 2;
+  border: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: stretch;
+  min-height: 0;
+}
+
+.osc-level > legend {
+  width: 36px;
+  margin-bottom: 0.04rem;
+  text-align: center;
+}
+
+.osc-level > output {
+  min-width: 36px;
+  margin: 0 0 0.08rem;
+  text-align: center;
+  padding: 0;
+}
+
+.level-wrap {
+  position: relative;
+  width: 36px;
+  flex: 1 1 auto;
+  min-height: 140px;
+  align-self: center;
+}
+
+.level-wrap::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  height: 3px;
+  bottom: clamp(2px, var(--level-pct, 50%), calc(100% - 2px));
+  background: #fff;
+  border-top: 1px solid #111;
+  border-bottom: 1px solid #111;
+  transform: translateY(50%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.osc-level > .level-wrap > input[type="range"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  border: 1px solid #111;
+  background: linear-gradient(
+    to top,
+    #111 0%,
+    #111 var(--level-pct, 50%),
+    #fff var(--level-pct, 50%),
+    #fff 100%
+  );
+}
+
+.osc-level > .level-wrap > input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.osc-level > .level-wrap > input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 0;
+  height: 0;
+  border: 0;
+  background: transparent;
+  margin: 0;
+}
+
+.osc-level > .level-wrap > input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.osc-level > .level-wrap > input[type="range"]::-moz-range-progress {
+  background: transparent;
+}
+
+.osc-level > .level-wrap > input[type="range"]:focus-visible {
+  outline: 1px solid #111;
+  outline-offset: 2px;
+}
+
+.osc-level > .level-wrap > input[type="range"]::-moz-range-thumb {
+  width: 0;
+  height: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  margin: 0;
 }
 
 .wave-group {
@@ -225,6 +381,23 @@ fieldset>select {
 .detune-wrap {
   grid-column: 1 / -1;
   position: relative;
+  width: 100%;
+  height: 36px;
+}
+
+.detune-wrap::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  left: clamp(3px, var(--detune-thumb, 50%), calc(100% - 3px));
+  width: 3px;
+  background: #fff;
+  border-left: 1px solid #111;
+  border-right: 1px solid #111;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 2;
 }
 
 .detune-wrap::after {
@@ -233,7 +406,7 @@ fieldset>select {
   left: 50%;
   top: 50%;
   width: 1px;
-  height: 0.8rem;
+  height: 20px;
   background: #111;
   transform: translate(-50%, -50%);
   pointer-events: none;
@@ -241,6 +414,58 @@ fieldset>select {
 
 .detune-wrap input[type="range"] {
   width: 100%;
+  height: 100%;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  border: 1px solid #111;
+  background: linear-gradient(
+    to right,
+    #fff 0%,
+    #fff calc(50% - var(--detune-left, 0%)),
+    #111 calc(50% - var(--detune-left, 0%)),
+    #111 50%,
+    #111 calc(50% + var(--detune-right, 0%)),
+    #fff calc(50% + var(--detune-right, 0%)),
+    #fff 100%
+  );
+}
+
+.detune-wrap input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.detune-wrap input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 0;
+  height: 0;
+  border: 0;
+  background: transparent;
+}
+
+.detune-wrap input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.detune-wrap input[type="range"]::-moz-range-progress {
+  background: transparent;
+}
+
+.detune-wrap input[type="range"]::-moz-range-thumb {
+  width: 0;
+  height: 0;
+  border: 0;
+  background: transparent;
+}
+
+.detune-wrap input[type="range"]:focus-visible {
+  outline: 1px solid #111;
+  outline-offset: 2px;
 }
 
 .wave-option svg {
@@ -346,5 +571,59 @@ button:active {
 @media (max-width: 620px) {
   fieldset {
     grid-template-columns: 1fr;
+  }
+
+  .osc-layout {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .osc-level {
+    grid-column: 1;
+    align-items: stretch;
+    padding: 0.25rem;
+  }
+
+  .osc-level > legend,
+  .osc-level > output {
+    text-align: center;
+    width: 100%;
+  }
+
+  .osc-level > .level-wrap {
+    width: 100%;
+    height: 40px;
+    min-height: 40px;
+    align-self: auto;
+  }
+
+  .osc-level > .level-wrap::before {
+    left: clamp(2px, var(--level-pct, 50%), calc(100% - 2px));
+    right: auto;
+    top: 1px;
+    bottom: 1px;
+    width: 3px;
+    height: auto;
+    border-top: 0;
+    border-bottom: 0;
+    border-left: 1px solid #111;
+    border-right: 1px solid #111;
+    transform: translateX(-50%);
+  }
+
+  .osc-level > .level-wrap > input[type="range"] {
+    width: 100%;
+    height: 40px;
+    min-height: 40px;
+    writing-mode: horizontal-tb;
+    direction: ltr;
+    -webkit-appearance: none;
+    background: linear-gradient(
+      to right,
+      #111 0%,
+      #111 var(--level-pct, 50%),
+      #fff var(--level-pct, 50%),
+      #fff 100%
+    );
   }
 }

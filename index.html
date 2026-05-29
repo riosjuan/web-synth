@@ -48,7 +48,9 @@
       <section class="panel">
         <h2>Oscillator 1</h2>
         <fieldset>
-          <fieldset class="control-group">
+          <div class="osc-layout">
+            <div class="osc-main">
+              <fieldset class="control-group">
             <legend>Waveform</legend>
             <div class="wave-group">
             <input
@@ -119,8 +121,10 @@
             </div>
           </fieldset>
 
-          <label for="osc1-detune">Detune (cents)</label>
-          <output id="osc1-detune-value">0</output>
+          <div class="detune-head">
+            <label for="osc1-detune">Detune (cents)</label>
+            <output id="osc1-detune-value">0</output>
+          </div>
           <div class="detune-wrap">
             <input
               id="osc1-detune"
@@ -132,25 +136,33 @@
               value="0"
             />
           </div>
+            </div>
 
-          <label for="osc1-level">Level</label>
-          <output id="osc1-level-value">0.50</output>
-          <input
-            id="osc1-level"
-            data-param="osc1Level"
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value="0.5"
-          />
+            <fieldset class="control-group osc-level" aria-label="Oscillator 1 level">
+              <legend>Level</legend>
+              <output id="osc1-level-value">0.50</output>
+              <div class="level-wrap">
+                <input
+                  id="osc1-level"
+                  data-param="osc1Level"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="0.5"
+                />
+              </div>
+            </fieldset>
+          </div>
         </fieldset>
       </section>
 
       <section class="panel">
         <h2>Oscillator 2</h2>
         <fieldset>
-          <fieldset class="control-group">
+          <div class="osc-layout">
+            <div class="osc-main">
+              <fieldset class="control-group">
             <legend>Waveform</legend>
             <div class="wave-group">
             <input
@@ -221,8 +233,10 @@
             </div>
           </fieldset>
 
-          <label for="osc2-detune">Detune (cents)</label>
-          <output id="osc2-detune-value">0</output>
+          <div class="detune-head">
+            <label for="osc2-detune">Detune (cents)</label>
+            <output id="osc2-detune-value">0</output>
+          </div>
           <div class="detune-wrap">
             <input
               id="osc2-detune"
@@ -234,18 +248,24 @@
               value="0"
             />
           </div>
+            </div>
 
-          <label for="osc2-level">Level</label>
-          <output id="osc2-level-value">0.50</output>
-          <input
-            id="osc2-level"
-            data-param="osc2Level"
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value="0.5"
-          />
+            <fieldset class="control-group osc-level" aria-label="Oscillator 2 level">
+              <legend>Level</legend>
+              <output id="osc2-level-value">0.50</output>
+              <div class="level-wrap">
+                <input
+                  id="osc2-level"
+                  data-param="osc2Level"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="0.5"
+                />
+              </div>
+            </fieldset>
+          </div>
         </fieldset>
       </section>
 
