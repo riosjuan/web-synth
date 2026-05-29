@@ -208,55 +208,66 @@
 
       <section class="panel">
         <h2>Envelope</h2>
-        <fieldset>
-          <label for="env-attack">Attack (s)</label>
-          <output id="env-attack-value">1</output>
-          <input
-            id="env-attack"
-            data-param="attack"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="1"
-          />
+        <div class="envelope-editor" id="envelope-editor">
+          <canvas
+            id="envelope-canvas"
+            class="envelope-canvas"
+            width="900"
+            height="540"
+            aria-label="ADSR envelope editor"
+            role="img"
+          ></canvas>
 
-          <label for="env-decay">Decay (s)</label>
-          <output id="env-decay-value">13</output>
-          <input
-            id="env-decay"
-            data-param="decay"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="13"
-          />
+          <div class="envelope-values">
+            <div><span>A</span><output id="env-attack-value">1</output></div>
+            <div><span>D</span><output id="env-decay-value">13</output></div>
+            <div><span>S</span><output id="env-sustain-value">89</output></div>
+            <div><span>R</span><output id="env-release-value">12</output></div>
+          </div>
 
-          <label for="env-sustain">Sustain</label>
-          <output id="env-sustain-value">89</output>
-          <input
-            id="env-sustain"
-            data-param="sustain"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="89"
-          />
-
-          <label for="env-release">Release (s)</label>
-          <output id="env-release-value">12</output>
-          <input
-            id="env-release"
-            data-param="release"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="12"
-          />
-        </fieldset>
+          <div class="sr-controls" aria-hidden="true" hidden>
+            <input
+              id="env-attack"
+              data-param="attack"
+              type="range"
+              min="0"
+              max="127"
+              step="1"
+              value="1"
+              tabindex="-1"
+            />
+            <input
+              id="env-decay"
+              data-param="decay"
+              type="range"
+              min="0"
+              max="127"
+              step="1"
+              value="13"
+              tabindex="-1"
+            />
+            <input
+              id="env-sustain"
+              data-param="sustain"
+              type="range"
+              min="0"
+              max="127"
+              step="1"
+              value="89"
+              tabindex="-1"
+            />
+            <input
+              id="env-release"
+              data-param="release"
+              type="range"
+              min="0"
+              max="127"
+              step="1"
+              value="12"
+              tabindex="-1"
+            />
+          </div>
+        </div>
       </section>
 
       <section class="panel">

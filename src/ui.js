@@ -3,6 +3,186 @@ import { formatParamValue, clampToConfig } from "./audio-utils.js";
 export function createControlBinder(params, targetLabels, ccMap) {
   const inputByParam = {};
   const outputByParam = {};
+  let redrawEnvelope = null;
+
+  function clampMidi(value) {
+    return Math.max(0, Math.min(127, Math.round(value)));
+  }
+
+  function setupEnvelopeEditor(onParamChange) {
+    const canvas = document.getElementById("envelope-canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const logicalWidth = 100;
+    const logicalHeight = 60;
+    const pad = 3;
+    const topY = pad;
+    const bottomY = logicalHeight - pad;
+    const maxTimeWidth = logicalWidth - pad * 2 - 12;
+    const maxX = logicalWidth - pad;
+    const minGap = 1.5;
+    const hitRadius = 5;
+    const nodeRadius = 1;
+    let activeNode = null;
+    let activePointerId = null;
+
+    function timeToX(value) {
+      return (clampMidi(value) / 127) * maxTimeWidth;
+    }
+
+    function xToTime(x) {
+      return clampMidi((Math.max(0, Math.min(maxTimeWidth, x)) / maxTimeWidth) * 127);
+    }
+
+    function sustainToX(value) {
+      return (clampMidi(value) / 127) * maxTimeWidth;
+    }
+
+    function xToSustain(x) {
+      return clampMidi((Math.max(0, Math.min(maxTimeWidth, x)) / maxTimeWidth) * 127);
+    }
+
+    function decayToY(value) {
+      return bottomY - (clampMidi(value) / 127) * (bottomY - topY);
+    }
+
+    function yToDecay(y) {
+      const clampedY = Math.max(topY, Math.min(bottomY, y));
+      return clampMidi(((bottomY - clampedY) / (bottomY - topY)) * 127);
+    }
+
+    function calculatePoints() {
+      const attackX = Math.min(maxTimeWidth, timeToX(params.attack));
+      const decayX = Math.min(maxTimeWidth, sustainToX(params.sustain));
+      const sustainY = decayToY(params.decay);
+      const releaseX = Math.max(decayX + minGap, Math.min(maxX, decayX + timeToX(params.release)));
+      return {
+        attack: { x: Math.max(pad, Math.min(maxX - nodeRadius, attackX + pad)), y: topY },
+        decaySustain: { x: Math.max(pad, Math.min(maxX - nodeRadius, decayX + pad)), y: sustainY },
+        release: { x: Math.max(pad, Math.min(maxX - nodeRadius, releaseX + pad)), y: sustainY },
+        sustainY,
+      };
+    }
+
+    function getCanvasPosition(event) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: ((event.clientX - rect.left) / rect.width) * logicalWidth,
+        y: ((event.clientY - rect.top) / rect.height) * logicalHeight,
+      };
+    }
+
+    function pickNode(x, y) {
+      const points = calculatePoints();
+      const names = ["attack", "decaySustain", "release"];
+      let best = null;
+      names.forEach((name) => {
+        const point = points[name];
+        const distance = Math.hypot(point.x - x, point.y - y);
+        if (distance <= hitRadius && (!best || distance < best.distance)) {
+          best = { name, distance };
+        }
+      });
+      return best?.name || null;
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width < 2 || rect.height < 2) return false;
+      const dpr = window.devicePixelRatio || 1;
+      const widthPx = Math.max(1, Math.round(rect.width * dpr));
+      const heightPx = Math.max(1, Math.round(rect.height * dpr));
+      if (canvas.width !== widthPx || canvas.height !== heightPx) {
+        canvas.width = widthPx;
+        canvas.height = heightPx;
+      }
+      ctx.setTransform(widthPx / logicalWidth, 0, 0, heightPx / logicalHeight, 0, 0);
+      return true;
+    }
+
+    function drawNode(point) {
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, nodeRadius, 0, Math.PI * 2);
+      ctx.fillStyle = "#111";
+      ctx.fill();
+    }
+
+    function draw() {
+      if (!resizeCanvas()) return;
+      ctx.clearRect(0, 0, logicalWidth, logicalHeight);
+      const points = calculatePoints();
+      ctx.beginPath();
+      ctx.moveTo(pad, bottomY);
+      ctx.lineTo(points.attack.x, points.attack.y);
+      ctx.lineTo(points.decaySustain.x, points.sustainY);
+      ctx.lineTo(points.release.x, points.sustainY);
+      ctx.lineTo(logicalWidth - pad, bottomY);
+      ctx.lineWidth = 0.6;
+      ctx.strokeStyle = "#111";
+      ctx.stroke();
+      drawNode(points.attack);
+      drawNode(points.decaySustain);
+      drawNode(points.release);
+    }
+
+    function applyFromPointer(event) {
+      if (!activeNode) return;
+      const { x, y } = getCanvasPosition(event);
+      if (activeNode === "attack") {
+        updateParamFromUI("attack", xToTime(Math.min(Math.max(0, x - pad), maxTimeWidth)), onParamChange);
+      }
+      if (activeNode === "decaySustain") {
+        updateParamFromUI("sustain", xToSustain(Math.min(Math.max(0, x - pad), maxTimeWidth)), onParamChange);
+        updateParamFromUI("decay", yToDecay(y), onParamChange);
+      }
+      if (activeNode === "release") {
+        const decayX = sustainToX(params.sustain);
+        updateParamFromUI("release", xToTime(Math.max(0, Math.min(maxTimeWidth, x - pad - decayX))), onParamChange);
+      }
+    }
+
+    canvas.addEventListener("pointerdown", (event) => {
+      const { x, y } = getCanvasPosition(event);
+      const node = pickNode(x, y);
+      if (!node) return;
+      activeNode = node;
+      activePointerId = event.pointerId;
+      if (canvas.setPointerCapture) {
+        try { canvas.setPointerCapture(event.pointerId); } catch (_error) {}
+      }
+      applyFromPointer(event);
+      draw();
+    });
+
+    canvas.addEventListener("pointermove", (event) => {
+      if (activePointerId !== null && event.pointerId !== activePointerId) return;
+      if (!activeNode) return;
+      applyFromPointer(event);
+    });
+
+    function releasePointer(event) {
+      if (activePointerId !== null && event.pointerId !== activePointerId) return;
+      if (canvas.releasePointerCapture) {
+        try { canvas.releasePointerCapture(event.pointerId); } catch (_error) {}
+      }
+      activeNode = null;
+      activePointerId = null;
+      draw();
+    }
+
+    canvas.addEventListener("pointerup", releasePointer);
+    canvas.addEventListener("pointercancel", releasePointer);
+    window.addEventListener("resize", draw);
+    if (typeof ResizeObserver !== "undefined") {
+      const resizeObserver = new ResizeObserver(() => draw());
+      resizeObserver.observe(canvas);
+    }
+
+    requestAnimationFrame(draw);
+    redrawEnvelope = draw;
+  }
 
   function updateLfoUiState() {
     ["lfo1", "lfo2"].forEach((lfoId) => {
@@ -43,17 +223,25 @@ export function createControlBinder(params, targetLabels, ccMap) {
       });
     });
     updateLfoUiState();
+    setupEnvelopeEditor(onParamChange);
   }
 
   function updateParamFromUI(paramName, value, onParamChange) {
     const normalized = typeof value === "number" ? clampToConfig(paramName, value) : value;
     params[paramName] = normalized;
+    const input = inputByParam[paramName];
+    if (input && !Array.isArray(input) && typeof normalized === "number") {
+      input.value = String(normalized);
+    }
     onParamChange(paramName, normalized);
     const output = outputByParam[paramName];
     if (output && typeof normalized === "number") {
       output.textContent = formatParamValue(paramName, normalized);
     }
     if (paramName.startsWith("lfo")) updateLfoUiState();
+    if (redrawEnvelope && ["attack", "decay", "sustain", "release"].includes(paramName)) {
+      redrawEnvelope();
+    }
   }
 
   function syncControl(paramName, value, onParamChange) {

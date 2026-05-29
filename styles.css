@@ -159,6 +159,48 @@ output {
   margin-bottom: 0.3rem;
 }
 
+.envelope-editor {
+  border: 1px solid #111;
+  padding: 0.5rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.envelope-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 5 / 3;
+  touch-action: none;
+  cursor: crosshair;
+  background: #fff;
+}
+
+.envelope-values {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.envelope-values div {
+  border: 1px solid #111;
+  padding: 0.2rem 0.35rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.envelope-values output {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+}
+
+.sr-controls {
+  display: none;
+}
+
 button {
   border: 1px solid #111;
   background: #fff;
