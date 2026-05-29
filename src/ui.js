@@ -20,49 +20,65 @@ export function createControlBinder(params, targetLabels, ccMap) {
     const pad = 3;
     const topY = pad;
     const bottomY = logicalHeight - pad;
-    const maxTimeWidth = logicalWidth - pad * 2 - 12;
-    const maxX = logicalWidth - pad;
-    const minGap = 1.5;
-    const hitRadius = 5;
+    const innerWidth = logicalWidth - pad * 2;
+    const sectionWidth = innerWidth / 4;
+    const sustainStartX = pad + sectionWidth * 2;
+    const sustainEndX = pad + sectionWidth * 3;
+    const minSectionWidth = 0.8;
+    const hitRadius = 4.5;
+    const sustainHitDistance = 3;
     const nodeRadius = 1;
     let activeNode = null;
     let activePointerId = null;
 
-    function timeToX(value) {
-      return (clampMidi(value) / 127) * maxTimeWidth;
+    function controlToX(value, minX, maxX) {
+      const clampedMin = Math.min(minX, maxX);
+      const clampedMax = Math.max(minX, maxX);
+      return clampedMin + (clampMidi(value) / 127) * (clampedMax - clampedMin);
     }
 
-    function xToTime(x) {
-      return clampMidi((Math.max(0, Math.min(maxTimeWidth, x)) / maxTimeWidth) * 127);
+    function xToControl(x, minX, maxX) {
+      const clampedMin = Math.min(minX, maxX);
+      const clampedMax = Math.max(minX, maxX);
+      const width = Math.max(0.0001, clampedMax - clampedMin);
+      return clampMidi(((x - clampedMin) / width) * 127);
     }
 
-    function sustainToX(value) {
-      return (clampMidi(value) / 127) * maxTimeWidth;
-    }
-
-    function xToSustain(x) {
-      return clampMidi((Math.max(0, Math.min(maxTimeWidth, x)) / maxTimeWidth) * 127);
-    }
-
-    function decayToY(value) {
+    function sustainControlToY(value) {
       return bottomY - (clampMidi(value) / 127) * (bottomY - topY);
     }
 
-    function yToDecay(y) {
+    function yToSustainControl(y) {
       const clampedY = Math.max(topY, Math.min(bottomY, y));
       return clampMidi(((bottomY - clampedY) / (bottomY - topY)) * 127);
     }
 
+    function distanceToSegment(point, a, b) {
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const lenSq = dx * dx + dy * dy;
+      if (lenSq === 0) return Math.hypot(point.x - a.x, point.y - a.y);
+      const t = Math.max(0, Math.min(1, ((point.x - a.x) * dx + (point.y - a.y) * dy) / lenSq));
+      const px = a.x + t * dx;
+      const py = a.y + t * dy;
+      return Math.hypot(point.x - px, point.y - py);
+    }
+
     function calculatePoints() {
-      const attackX = Math.min(maxTimeWidth, timeToX(params.attack));
-      const decayX = Math.min(maxTimeWidth, sustainToX(params.sustain));
-      const sustainY = decayToY(params.decay);
-      const releaseX = Math.max(decayX + minGap, Math.min(maxX, decayX + timeToX(params.release)));
+      const attackX = controlToX(params.attack, pad, pad + sectionWidth);
+      const decayX = controlToX(params.decay, pad + sectionWidth, sustainStartX - minSectionWidth);
+      const sustainY = sustainControlToY(params.sustain);
+      const releaseX = controlToX(
+        params.release,
+        sustainEndX + minSectionWidth,
+        logicalWidth - pad,
+      );
       return {
-        attack: { x: Math.max(pad, Math.min(maxX - nodeRadius, attackX + pad)), y: topY },
-        decaySustain: { x: Math.max(pad, Math.min(maxX - nodeRadius, decayX + pad)), y: sustainY },
-        release: { x: Math.max(pad, Math.min(maxX - nodeRadius, releaseX + pad)), y: sustainY },
-        sustainY,
+        start: { x: pad, y: bottomY },
+        attack: { x: attackX, y: topY },
+        decay: { x: decayX, y: sustainY },
+        sustainEnd: { x: sustainEndX, y: sustainY },
+        release: { x: releaseX, y: bottomY },
       };
     }
 
@@ -76,7 +92,8 @@ export function createControlBinder(params, targetLabels, ccMap) {
 
     function pickNode(x, y) {
       const points = calculatePoints();
-      const names = ["attack", "decaySustain", "release"];
+      const pointer = { x, y };
+      const names = ["attack", "decay", "release"];
       let best = null;
       names.forEach((name) => {
         const point = points[name];
@@ -85,7 +102,10 @@ export function createControlBinder(params, targetLabels, ccMap) {
           best = { name, distance };
         }
       });
-      return best?.name || null;
+      if (best) return best.name;
+      const sustainDistance = distanceToSegment(pointer, points.decay, points.sustainEnd);
+      if (sustainDistance <= sustainHitDistance) return "sustain";
+      return null;
     }
 
     function resizeCanvas() {
@@ -114,32 +134,48 @@ export function createControlBinder(params, targetLabels, ccMap) {
       ctx.clearRect(0, 0, logicalWidth, logicalHeight);
       const points = calculatePoints();
       ctx.beginPath();
-      ctx.moveTo(pad, bottomY);
+      ctx.moveTo(points.start.x, points.start.y);
       ctx.lineTo(points.attack.x, points.attack.y);
-      ctx.lineTo(points.decaySustain.x, points.sustainY);
-      ctx.lineTo(points.release.x, points.sustainY);
-      ctx.lineTo(logicalWidth - pad, bottomY);
-      ctx.lineWidth = 0.6;
+      ctx.lineTo(points.decay.x, points.decay.y);
+      ctx.lineTo(points.sustainEnd.x, points.sustainEnd.y);
+      ctx.lineTo(points.release.x, points.release.y);
+      ctx.lineWidth = 0.25;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
       ctx.strokeStyle = "#111";
       ctx.stroke();
       drawNode(points.attack);
-      drawNode(points.decaySustain);
+      drawNode(points.decay);
       drawNode(points.release);
     }
 
     function applyFromPointer(event) {
       if (!activeNode) return;
       const { x, y } = getCanvasPosition(event);
+      const points = calculatePoints();
       if (activeNode === "attack") {
-        updateParamFromUI("attack", xToTime(Math.min(Math.max(0, x - pad), maxTimeWidth)), onParamChange);
+        const minX = pad;
+        const maxX = pad + sectionWidth;
+        const clampedX = Math.max(minX, Math.min(maxX, x));
+        updateParamFromUI("attack", xToControl(clampedX, minX, maxX), onParamChange);
+        return;
       }
-      if (activeNode === "decaySustain") {
-        updateParamFromUI("sustain", xToSustain(Math.min(Math.max(0, x - pad), maxTimeWidth)), onParamChange);
-        updateParamFromUI("decay", yToDecay(y), onParamChange);
+      if (activeNode === "decay") {
+        const minX = pad + sectionWidth;
+        const maxX = sustainStartX - minSectionWidth;
+        const clampedX = Math.max(minX, Math.min(maxX, x));
+        updateParamFromUI("decay", xToControl(clampedX, minX, maxX), onParamChange);
+        return;
+      }
+      if (activeNode === "sustain") {
+        updateParamFromUI("sustain", yToSustainControl(y), onParamChange);
+        return;
       }
       if (activeNode === "release") {
-        const decayX = sustainToX(params.sustain);
-        updateParamFromUI("release", xToTime(Math.max(0, Math.min(maxTimeWidth, x - pad - decayX))), onParamChange);
+        const minX = sustainEndX + minSectionWidth;
+        const maxReleaseX = logicalWidth - pad;
+        const clampedX = Math.max(minX, Math.min(maxReleaseX, x));
+        updateParamFromUI("release", xToControl(clampedX, minX, maxReleaseX), onParamChange);
       }
     }
 
@@ -150,7 +186,9 @@ export function createControlBinder(params, targetLabels, ccMap) {
       activeNode = node;
       activePointerId = event.pointerId;
       if (canvas.setPointerCapture) {
-        try { canvas.setPointerCapture(event.pointerId); } catch (_error) {}
+        try {
+          canvas.setPointerCapture(event.pointerId);
+        } catch (_error) {}
       }
       applyFromPointer(event);
       draw();
@@ -165,7 +203,9 @@ export function createControlBinder(params, targetLabels, ccMap) {
     function releasePointer(event) {
       if (activePointerId !== null && event.pointerId !== activePointerId) return;
       if (canvas.releasePointerCapture) {
-        try { canvas.releasePointerCapture(event.pointerId); } catch (_error) {}
+        try {
+          canvas.releasePointerCapture(event.pointerId);
+        } catch (_error) {}
       }
       activeNode = null;
       activePointerId = null;
