@@ -145,6 +145,11 @@ fieldset>select {
   display: block;
 }
 
+.control-group > legend {
+  padding: 0;
+  margin-bottom: 0.25rem;
+}
+
 .wave-group {
   grid-column: 1 / -1;
   display: grid;
