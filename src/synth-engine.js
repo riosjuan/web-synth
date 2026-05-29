@@ -50,6 +50,7 @@ export class Synth {
     this.expression = 1;
     this.sustainPedalDown = false;
     this.sustainedVoiceIds = new Set();
+    this.isSourceMuted = false;
   }
 
   async init() {
@@ -128,6 +129,7 @@ export class Synth {
     this.outputLimiter.connect(this.audioContext.destination);
 
     this.updateEffectsFromParams();
+    this.applySourceMuteState();
     this.initLfos();
 
     if (this.audioContext.state === "suspended") {
@@ -157,6 +159,7 @@ export class Synth {
       this.voices.forEach((voice) => {
         voice[`${name.slice(0, 4)}Gain`].gain.setTargetAtTime(value, now, 0.01);
       });
+      this.applySourceMuteState();
       return;
     }
     if (name.startsWith("osc")) {
@@ -169,6 +172,34 @@ export class Synth {
       return;
     }
     if (name.startsWith("fx")) {
+      this.updateEffectsFromParams();
+    }
+  }
+
+  hasAudibleSource() {
+    return this.params.osc1Level > 0 || this.params.osc2Level > 0;
+  }
+
+  applySourceMuteState() {
+    if (!this.audioContext) return;
+    const now = this.audioContext.currentTime;
+    const shouldMute = !this.hasAudibleSource();
+    if (shouldMute) {
+      if (!this.isSourceMuted) {
+        this.forceAllNotesOff();
+      }
+      this.isSourceMuted = true;
+      this.delaySendGain.gain.setTargetAtTime(0, now, 0.005);
+      this.chorusSendGain.gain.setTargetAtTime(0, now, 0.005);
+      this.reverbSendGain.gain.setTargetAtTime(0, now, 0.005);
+      this.distSendGain.gain.setTargetAtTime(0, now, 0.005);
+      this.fxWetGain.gain.setTargetAtTime(0, now, 0.005);
+      this.fxDryGain.gain.setTargetAtTime(1, now, 0.005);
+      return;
+    }
+
+    if (this.isSourceMuted) {
+      this.isSourceMuted = false;
       this.updateEffectsFromParams();
     }
   }
@@ -228,9 +259,19 @@ export class Synth {
   updateMasterGain() { if (!this.audioContext || !this.masterGain) return; const now = this.audioContext.currentTime; this.masterGain.gain.setTargetAtTime(this.params.masterVolume * this.expression, now, 0.01); }
   setExpressionFromCC(ccValue) { this.expression = Math.max(0, Math.min(1, ccValue / 127)); this.updateMasterGain(); }
   applyOscParamsToVoice(voice) { const f1 = midiToFrequency(voice.note + this.params.osc1Octave * 12); const f2 = midiToFrequency(voice.note + this.params.osc2Octave * 12); const now = this.audioContext.currentTime; voice.osc1.type = this.params.osc1Wave; voice.osc2.type = this.params.osc2Wave; voice.osc1.frequency.setTargetAtTime(f1, now, 0.01); voice.osc2.frequency.setTargetAtTime(f2, now, 0.01); voice.osc1.detune.setTargetAtTime(this.params.osc1Detune, now, 0.01); voice.osc2.detune.setTargetAtTime(this.params.osc2Detune, now, 0.01); voice.osc1Gain.gain.setTargetAtTime(this.params.osc1Level, now, 0.01); voice.osc2Gain.gain.setTargetAtTime(this.params.osc2Level, now, 0.01); }
+  stopVoiceImmediately(voiceId) {
+    const voice = this.voices.get(voiceId);
+    if (!voice) return;
+    try { voice.osc1.stop(); } catch (_e) {}
+    try { voice.osc2.stop(); } catch (_e) {}
+    voice.osc1.disconnect(); voice.osc2.disconnect(); voice.osc1Gain.disconnect(); voice.osc2Gain.disconnect(); voice.amp.disconnect();
+    this.voices.delete(voiceId);
+    this.sustainedVoiceIds.delete(voiceId);
+  }
   noteOn(note, velocity = 127, voiceId = note) {
     if (!this.audioContext || this.audioContext.state !== "running") return;
-    this.noteOff(voiceId);
+    if (!this.hasAudibleSource()) return;
+    this.stopVoiceImmediately(voiceId);
     const now = this.audioContext.currentTime; const velocityGain = Math.max(0, Math.min(1, velocity / 127));
     const osc1 = this.audioContext.createOscillator(); const osc2 = this.audioContext.createOscillator();
     const osc1Gain = this.audioContext.createGain(); const osc2Gain = this.audioContext.createGain(); const amp = this.audioContext.createGain();
