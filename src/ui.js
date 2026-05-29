@@ -258,7 +258,13 @@ export function createControlBinder(params, targetLabels, ccMap) {
       el.addEventListener("input", () => {
         const isSelect = el.tagName.toLowerCase() === "select";
         const isRadio = el.type === "radio";
-        const value = isSelect || isRadio ? el.value : Number(el.value);
+        const expectsNumber = typeof params[paramName] === "number";
+        let value;
+        if (isRadio) {
+          value = expectsNumber ? Number(el.value) : el.value;
+        } else {
+          value = isSelect ? el.value : Number(el.value);
+        }
         updateParamFromUI(paramName, value, onParamChange);
       });
     });
@@ -291,7 +297,8 @@ export function createControlBinder(params, targetLabels, ccMap) {
       input.forEach((radio) => {
         radio.checked = radio.value === String(value);
       });
-      updateParamFromUI(paramName, String(value), onParamChange);
+      const normalizedValue = typeof params[paramName] === "number" ? Number(value) : String(value);
+      updateParamFromUI(paramName, normalizedValue, onParamChange);
       return;
     }
     input.value = String(value);
