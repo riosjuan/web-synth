@@ -2,50 +2,70 @@
   box-sizing: border-box;
 }
 
+:root {
+  --paper: #fff;
+  --ink: #111;
+  --line: 1px solid var(--ink);
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --control-h: 40px;
+  --grid-cell: 24px;
+  --type-ui: 0.9rem;
+  --type-label: 0.86rem;
+}
+
 body {
   margin: 0;
-  background: #fff;
-  color: #111;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  line-height: 1.3;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
 }
 
 .app {
   max-width: 100vw;
   margin: 0 auto;
-  padding: 1rem;
+  padding: var(--space-4);
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 h1 {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.35rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .topbar {
-  border: 1px solid #111;
-  padding: 0.5rem;
+  border: var(--line);
+  padding: var(--space-2);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: var(--space-3);
   width: 100%;
 }
 
 h2 {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: var(--type-label);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .panel {
-  border: 1px solid #111;
-  padding: 0.5rem;
+  border: var(--line);
+  padding: var(--space-2);
   display: grid;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .row {
@@ -55,8 +75,23 @@ h2 {
   flex-wrap: wrap;
 }
 
+label,
+legend {
+  font-size: var(--type-label);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+#audio-status,
+#midi-status,
+#midi-clock-status,
+output {
+  font-size: var(--type-ui);
+}
+
 .table-wrap {
-  border: 1px solid #111;
+  border: var(--line);
   overflow: auto;
 }
 
@@ -77,9 +112,9 @@ h2 {
 
 .cc-dialog-panel {
   width: min(760px, calc(100vw - 2rem));
-  background: #fff;
-  border: 1px solid #111;
-  padding: 0.75rem;
+  background: var(--paper);
+  border: var(--line);
+  padding: var(--space-3);
 }
 
 .dialog-header {
@@ -97,7 +132,7 @@ h2 {
 
 .cc-table th,
 .cc-table td {
-  border: 1px solid #111;
+  border: var(--line);
   padding: 0.3rem 0.45rem;
   text-align: left;
   white-space: nowrap;
@@ -108,7 +143,7 @@ h2 {
 }
 
 fieldset {
-  border: 1px solid #111;
+  border: var(--line);
   margin: 0;
   padding: 0.4rem;
   display: grid;
@@ -119,6 +154,7 @@ fieldset {
 }
 
 label,
+legend,
 input,
 select,
 button,
@@ -148,7 +184,7 @@ fieldset>select {
 .control-group > legend {
   padding: 0;
   margin-bottom: 0.12rem;
-  font-size: 0.95rem;
+  letter-spacing: 0.05em;
 }
 
 .osc-layout {
@@ -311,7 +347,7 @@ fieldset>select {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
-  border: 1px solid #111;
+  border: var(--line);
 }
 
 .wave-group input[type="radio"] {
@@ -322,11 +358,11 @@ fieldset>select {
 
 .wave-option {
   border: 0;
-  border-left: 1px solid #111;
-  background: #fff;
-  color: #111;
-  min-height: 40px;
-  height: 40px;
+  border-left: var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  min-height: var(--control-h);
+  height: var(--control-h);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -342,7 +378,7 @@ fieldset>select {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0;
-  border: 1px solid #111;
+  border: var(--line);
 }
 
 .segment-group input[type="radio"] {
@@ -353,11 +389,11 @@ fieldset>select {
 
 .segment-option {
   border: 0;
-  border-left: 1px solid #111;
-  background: #fff;
-  color: #111;
-  min-height: 40px;
-  height: 40px;
+  border-left: var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  min-height: var(--control-h);
+  height: var(--control-h);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -369,12 +405,12 @@ fieldset>select {
 }
 
 .segment-group input[type="radio"]:checked + .segment-option {
-  background: #111;
-  color: #fff;
+  background: var(--ink);
+  color: var(--paper);
 }
 
 .segment-group input[type="radio"]:focus-visible + .segment-option {
-  outline: 2px solid #111;
+  outline: 2px solid var(--ink);
   outline-offset: 1px;
 }
 
@@ -419,7 +455,7 @@ fieldset>select {
   appearance: none;
   -webkit-appearance: none;
   outline: none;
-  border: 1px solid #111;
+  border: var(--line);
   background: linear-gradient(
     to right,
     #fff 0%,
@@ -482,12 +518,12 @@ fieldset>select {
 }
 
 .wave-group input[type="radio"]:checked + .wave-option {
-  background: #111;
-  color: #fff;
+  background: var(--ink);
+  color: var(--paper);
 }
 
 .wave-group input[type="radio"]:focus-visible + .wave-option {
-  outline: 2px solid #111;
+  outline: 2px solid var(--ink);
   outline-offset: 1px;
 }
 
@@ -510,13 +546,14 @@ output {
   padding-left: 0;
   margin-top: 0;
   margin-bottom: 0.3rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .envelope-editor {
-  border: 1px solid #111;
-  padding: 0.5rem;
+  border: var(--line);
+  padding: var(--space-2);
   display: grid;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .envelope-canvas {
@@ -536,7 +573,7 @@ output {
 }
 
 .envelope-values div {
-  border: 1px solid #111;
+  border: var(--line);
   padding: 0.2rem 0.35rem;
   display: flex;
   justify-content: space-between;
@@ -555,13 +592,16 @@ output {
 }
 
 button {
-  border: 1px solid #111;
-  background: #fff;
-  color: #111;
-  min-height: 40px;
-  height: 40px;
+  border: var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  min-height: var(--control-h);
+  height: var(--control-h);
   padding: 0.25rem 0.5rem;
   cursor: pointer;
+  text-transform: uppercase;
+  font-size: var(--type-label);
+  letter-spacing: 0.06em;
 }
 
 button:active {
