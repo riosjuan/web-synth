@@ -24,6 +24,11 @@ export function setupEnvelopeEditor(params, updateParamFromUI, onParamChange) {
   let activeNode = null;
   let activePointerId = null;
 
+  function getThemeInk() {
+    const bodyColor = getComputedStyle(document.body).color;
+    return bodyColor || "#111";
+  }
+
   function controlToX(value, minX, maxX) {
     const clampedMin = Math.min(minX, maxX);
     const clampedMax = Math.max(minX, maxX);
@@ -114,7 +119,7 @@ export function setupEnvelopeEditor(params, updateParamFromUI, onParamChange) {
   function drawNode(point) {
     ctx.beginPath();
     ctx.arc(point.x, point.y, nodeRadius, 0, Math.PI * 2);
-    ctx.fillStyle = "#111";
+    ctx.fillStyle = getThemeInk();
     ctx.fill();
   }
 
@@ -131,7 +136,7 @@ export function setupEnvelopeEditor(params, updateParamFromUI, onParamChange) {
     ctx.lineWidth = 0.25;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
-    ctx.strokeStyle = "#111";
+    ctx.strokeStyle = getThemeInk();
     ctx.stroke();
     drawNode(points.attack);
     drawNode(points.decay);
@@ -203,6 +208,7 @@ export function setupEnvelopeEditor(params, updateParamFromUI, onParamChange) {
   canvas.addEventListener("pointerup", releasePointer);
   canvas.addEventListener("pointercancel", releasePointer);
   window.addEventListener("resize", draw);
+  window.addEventListener("themechange", draw);
   if (typeof ResizeObserver !== "undefined") {
     const resizeObserver = new ResizeObserver(() => draw());
     resizeObserver.observe(canvas);

@@ -3,8 +3,10 @@
 }
 
 :root {
-  --paper: #fff;
-  --ink: #111;
+  color-scheme: light dark;
+  --paper: light-dark(#f7f7f7, #0f1113);
+  --ink: light-dark(#101010, #eceff1);
+  --papper: var(--paper);
   --line: 1px solid var(--ink);
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -51,6 +53,21 @@ h1 {
   justify-content: space-between;
   gap: var(--space-3);
   width: 100%;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.theme-toggle:hover {
+  background: light-dark(#efefef, #1a1d20);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 h2 {
@@ -274,9 +291,9 @@ fieldset>select {
   right: 1px;
   height: 3px;
   bottom: clamp(2px, var(--level-pct, 50%), calc(100% - 2px));
-  background: #fff;
-  border-top: 1px solid #111;
-  border-bottom: 1px solid #111;
+  background: var(--paper);
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
   transform: translateY(50%);
   pointer-events: none;
   z-index: 2;
@@ -293,13 +310,13 @@ fieldset>select {
   -webkit-appearance: none;
   appearance: none;
   outline: none;
-  border: 1px solid #111;
+  border: 1px solid var(--ink);
   background: linear-gradient(
     to top,
-    #111 0%,
-    #111 var(--level-pct, 50%),
-    #fff var(--level-pct, 50%),
-    #fff 100%
+    var(--ink) 0%,
+    var(--ink) var(--level-pct, 50%),
+    var(--paper) var(--level-pct, 50%),
+    var(--paper) 100%
   );
 }
 
@@ -329,7 +346,7 @@ fieldset>select {
 }
 
 .osc-level > .level-wrap > input[type="range"]:focus-visible {
-  outline: 1px solid #111;
+  outline: 1px solid var(--ink);
   outline-offset: 2px;
 }
 
@@ -428,9 +445,9 @@ fieldset>select {
   bottom: 1px;
   left: clamp(3px, var(--detune-thumb, 50%), calc(100% - 3px));
   width: 3px;
-  background: #fff;
-  border-left: 1px solid #111;
-  border-right: 1px solid #111;
+  background: var(--paper);
+  border-left: 1px solid var(--ink);
+  border-right: 1px solid var(--ink);
   transform: translateX(-50%);
   pointer-events: none;
   z-index: 2;
@@ -443,7 +460,7 @@ fieldset>select {
   top: 50%;
   width: 1px;
   height: 20px;
-  background: #111;
+  background: var(--ink);
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
@@ -458,13 +475,13 @@ fieldset>select {
   border: var(--line);
   background: linear-gradient(
     to right,
-    #fff 0%,
-    #fff calc(50% - var(--detune-left, 0%)),
-    #111 calc(50% - var(--detune-left, 0%)),
-    #111 50%,
-    #111 calc(50% + var(--detune-right, 0%)),
-    #fff calc(50% + var(--detune-right, 0%)),
-    #fff 100%
+    var(--paper) 0%,
+    var(--paper) calc(50% - var(--detune-left, 0%)),
+    var(--ink) calc(50% - var(--detune-left, 0%)),
+    var(--ink) 50%,
+    var(--ink) calc(50% + var(--detune-right, 0%)),
+    var(--paper) calc(50% + var(--detune-right, 0%)),
+    var(--paper) 100%
   );
 }
 
@@ -500,7 +517,7 @@ fieldset>select {
 }
 
 .detune-wrap input[type="range"]:focus-visible {
-  outline: 1px solid #111;
+  outline: 1px solid var(--ink);
   outline-offset: 2px;
 }
 
@@ -563,7 +580,7 @@ output {
   aspect-ratio: 5 / 3;
   touch-action: none;
   cursor: crosshair;
-  background: #fff;
+  background: var(--paper);
 }
 
 .envelope-values {
@@ -646,8 +663,8 @@ button:active {
     height: auto;
     border-top: 0;
     border-bottom: 0;
-    border-left: 1px solid #111;
-    border-right: 1px solid #111;
+    border-left: 1px solid var(--ink);
+    border-right: 1px solid var(--ink);
     transform: translateX(-50%);
   }
 
@@ -660,10 +677,18 @@ button:active {
     -webkit-appearance: none;
     background: linear-gradient(
       to right,
-      #111 0%,
-      #111 var(--level-pct, 50%),
-      #fff var(--level-pct, 50%),
-      #fff 100%
+      var(--ink) 0%,
+      var(--ink) var(--level-pct, 50%),
+      var(--paper) var(--level-pct, 50%),
+      var(--paper) 100%
     );
   }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }
