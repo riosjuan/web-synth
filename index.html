@@ -673,126 +673,194 @@
 
       <section class="panel">
         <h2>Effects</h2>
-        <fieldset>
-          <label for="fx-delay-time">Delay Time</label>
-          <output id="fx-delay-time-value">32</output>
-          <input
-            id="fx-delay-time"
-            data-param="fxDelayTime"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="32"
-          />
+        <fieldset class="fx-controls">
+          <div class="fx-section">
+            <div class="fx-control">
+              <div class="fx-head">
+                <label for="fx-delay-time">Delay Time</label>
+                <output id="fx-delay-time-value">32</output>
+              </div>
+              <div class="fx-range-wrap">
+                <input
+                  id="fx-delay-time"
+                  data-param="fxDelayTime"
+                  type="range"
+                  min="0"
+                  max="127"
+                  step="1"
+                  value="32"
+                />
+              </div>
+            </div>
 
-          <label for="fx-delay-feedback">Delay Feedback</label>
-          <output id="fx-delay-feedback-value">22</output>
-          <input
-            id="fx-delay-feedback"
-            data-param="fxDelayFeedback"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="22"
-          />
+            <div class="fx-control">
+              <div class="fx-head">
+                <label for="fx-delay-feedback">Delay Feedback</label>
+                <output id="fx-delay-feedback-value">22</output>
+              </div>
+              <div class="fx-range-wrap">
+                <input
+                  id="fx-delay-feedback"
+                  data-param="fxDelayFeedback"
+                  type="range"
+                  min="0"
+                  max="127"
+                  step="1"
+                  value="22"
+                />
+              </div>
+            </div>
 
-          <label for="fx-delay-mix">Delay Mix</label>
-          <output id="fx-delay-mix-value">12</output>
-          <input
-            id="fx-delay-mix"
-            data-param="fxDelayMix"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="12"
-          />
+            <div class="fx-control">
+              <div class="fx-head">
+                <label for="fx-delay-mix">Delay Mix</label>
+                <output id="fx-delay-mix-value">12</output>
+              </div>
+              <div class="fx-range-wrap">
+                <input
+                  id="fx-delay-mix"
+                  data-param="fxDelayMix"
+                  type="range"
+                  min="0"
+                  max="127"
+                  step="1"
+                  value="12"
+                />
+              </div>
+            </div>
+          </div>
 
-          <label for="fx-chorus-rate">Chorus Rate</label>
-          <output id="fx-chorus-rate-value">26</output>
-          <input
-            id="fx-chorus-rate"
-            data-param="fxChorusRate"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="26"
-          />
+          <div class="fx-section">
+            <div class="fx-control">
+              <div class="fx-head">
+                <label for="fx-chorus-rate">Chorus Rate</label>
+                <output id="fx-chorus-rate-value">26</output>
+              </div>
+              <div class="fx-range-wrap">
+                <input
+                  id="fx-chorus-rate"
+                  data-param="fxChorusRate"
+                  type="range"
+                  min="0"
+                  max="127"
+                  step="1"
+                  value="26"
+                />
+              </div>
+            </div>
 
-          <label for="fx-chorus-depth">Chorus Depth</label>
-          <output id="fx-chorus-depth-value">18</output>
-          <input
-            id="fx-chorus-depth"
-            data-param="fxChorusDepth"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="18"
-          />
+            <div class="fx-control">
+              <div class="fx-head">
+                <label for="fx-chorus-depth">Chorus Depth</label>
+                <output id="fx-chorus-depth-value">18</output>
+              </div>
+              <div class="fx-range-wrap">
+                <input
+                  id="fx-chorus-depth"
+                  data-param="fxChorusDepth"
+                  type="range"
+                  min="0"
+                  max="127"
+                  step="1"
+                  value="18"
+                />
+              </div>
+            </div>
 
-          <label for="fx-chorus-mix">Chorus Mix</label>
-          <output id="fx-chorus-mix-value">10</output>
-          <input
-            id="fx-chorus-mix"
-            data-param="fxChorusMix"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="10"
-          />
+            <div class="fx-control">
+              <div class="fx-head">
+                <label for="fx-chorus-mix">Chorus Mix</label>
+                <output id="fx-chorus-mix-value">10</output>
+              </div>
+              <div class="fx-range-wrap">
+                <input
+                  id="fx-chorus-mix"
+                  data-param="fxChorusMix"
+                  type="range"
+                  min="0"
+                  max="127"
+                  step="1"
+                  value="10"
+                />
+              </div>
+            </div>
+          </div>
 
-          <label for="fx-reverb-size">Reverb Size</label>
-          <output id="fx-reverb-size-value">36</output>
-          <input
-            id="fx-reverb-size"
-            data-param="fxReverbSize"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="36"
-          />
+          <div class="fx-section">
+            <div class="fx-control">
+              <div class="fx-head">
+                <label for="fx-reverb-size">Reverb Size</label>
+                <output id="fx-reverb-size-value">36</output>
+              </div>
+              <div class="fx-range-wrap">
+                <input
+                  id="fx-reverb-size"
+                  data-param="fxReverbSize"
+                  type="range"
+                  min="0"
+                  max="127"
+                  step="1"
+                  value="36"
+                />
+              </div>
+            </div>
 
-          <label for="fx-reverb-mix">Reverb Mix</label>
-          <output id="fx-reverb-mix-value">14</output>
-          <input
-            id="fx-reverb-mix"
-            data-param="fxReverbMix"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="14"
-          />
+            <div class="fx-control">
+              <div class="fx-head">
+                <label for="fx-reverb-mix">Reverb Mix</label>
+                <output id="fx-reverb-mix-value">14</output>
+              </div>
+              <div class="fx-range-wrap">
+                <input
+                  id="fx-reverb-mix"
+                  data-param="fxReverbMix"
+                  type="range"
+                  min="0"
+                  max="127"
+                  step="1"
+                  value="14"
+                />
+              </div>
+            </div>
+          </div>
 
-          <label for="fx-dist-drive">Distortion Drive</label>
-          <output id="fx-dist-drive-value">8</output>
-          <input
-            id="fx-dist-drive"
-            data-param="fxDistDrive"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="8"
-          />
+          <div class="fx-section">
+            <div class="fx-control">
+              <div class="fx-head">
+                <label for="fx-dist-drive">Distortion Drive</label>
+                <output id="fx-dist-drive-value">8</output>
+              </div>
+              <div class="fx-range-wrap">
+                <input
+                  id="fx-dist-drive"
+                  data-param="fxDistDrive"
+                  type="range"
+                  min="0"
+                  max="127"
+                  step="1"
+                  value="8"
+                />
+              </div>
+            </div>
 
-          <label for="fx-dist-mix">Distortion Mix</label>
-          <output id="fx-dist-mix-value">6</output>
-          <input
-            id="fx-dist-mix"
-            data-param="fxDistMix"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="6"
-          />
+            <div class="fx-control">
+              <div class="fx-head">
+                <label for="fx-dist-mix">Distortion Mix</label>
+                <output id="fx-dist-mix-value">6</output>
+              </div>
+              <div class="fx-range-wrap">
+                <input
+                  id="fx-dist-mix"
+                  data-param="fxDistMix"
+                  type="range"
+                  min="0"
+                  max="127"
+                  step="1"
+                  value="6"
+                />
+              </div>
+            </div>
+          </div>
         </fieldset>
       </section>
     </main>

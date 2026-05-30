@@ -70,6 +70,22 @@ export function syncLfoRangeStyle(input, value) {
   }
 }
 
+export function syncFxRangeStyle(input, value) {
+  if (!isSingleInput(input)) return;
+  const min = Number(input.min);
+  const max = Number(input.max);
+  const numericValue = Number(value);
+  if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min || !Number.isFinite(numericValue)) return;
+
+  const pct = `${Math.round(((numericValue - min) / (max - min)) * 100)}%`;
+  input.style.setProperty("--fx-pct", pct);
+
+  const wrap = input.closest(".fx-range-wrap");
+  if (wrap) {
+    wrap.style.setProperty("--fx-pct", pct);
+  }
+}
+
 export function syncRangeStyleForParam(paramName, input, value) {
   if (paramName === "osc1Level" || paramName === "osc2Level") {
     syncLevelRangeStyle(input, value);
@@ -89,5 +105,9 @@ export function syncRangeStyleForParam(paramName, input, value) {
   }
   if (paramName === "filterCutoff" || paramName === "filterQ") {
     syncFilterRangeStyle(input, value);
+    return;
+  }
+  if (paramName.startsWith("fx")) {
+    syncFxRangeStyle(input, value);
   }
 }

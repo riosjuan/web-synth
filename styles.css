@@ -949,6 +949,121 @@ fieldset>select {
   outline-offset: 2px;
 }
 
+.fx-controls {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.fx-section {
+  display: grid;
+  gap: 0.24rem;
+  padding-top: var(--space-2);
+}
+
+.fx-section:first-child {
+  padding-top: 0;
+}
+
+.fx-section + .fx-section {
+  border-top: var(--line);
+  margin-top: var(--space-2);
+}
+
+.fx-control {
+  display: grid;
+  gap: 0.08rem;
+}
+
+.fx-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.fx-head > label,
+.fx-head > output {
+  margin: 0;
+  padding: 0;
+}
+
+.fx-head > output {
+  min-width: 2.2rem;
+  text-align: right;
+}
+
+.fx-range-wrap {
+  grid-column: 1 / -1;
+  position: relative;
+  width: 100%;
+  height: 28px;
+}
+
+.fx-range-wrap::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  left: clamp(3px, var(--fx-pct, 50%), calc(100% - 3px));
+  width: 3px;
+  background: var(--paper);
+  border-left: 1px solid var(--ink);
+  border-right: 1px solid var(--ink);
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.fx-range-wrap input[type="range"] {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  border: var(--line);
+  background: linear-gradient(to right,
+      var(--accent) 0%,
+      var(--accent) var(--fx-pct, 50%),
+      var(--paper) var(--fx-pct, 50%),
+      var(--paper) 100%);
+}
+
+.fx-range-wrap input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.fx-range-wrap input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 0;
+  height: 0;
+  border: 0;
+  background: transparent;
+}
+
+.fx-range-wrap input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.fx-range-wrap input[type="range"]::-moz-range-progress {
+  background: transparent;
+}
+
+.fx-range-wrap input[type="range"]::-moz-range-thumb {
+  width: 0;
+  height: 0;
+  border: 0;
+  background: transparent;
+}
+
+.fx-range-wrap input[type="range"]:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 2px;
+}
+
 .wave-option svg {
   width: 1.35rem;
   height: 1.1rem;
