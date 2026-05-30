@@ -182,32 +182,93 @@ export class Synth {
     }
   }
 
-  updateEffectsFromParams() { /* unchanged behavior */
+  updateEffectsFromParams() {
     if (!this.audioContext) return;
     applyEffectsFromParams(this.audioContext, this, this.params);
   }
 
-  initLfos() { initLfoState(this); }
-  createLfo(lfoId) { createLfoNode(this, lfoId); }
-  updateLfoFromParams(lfoId) { applyLfoFromParams(this, lfoId); }
-  resolveLfoRate(rateMode, freeRate, division) { return getResolvedLfoRate(this, rateMode, freeRate, division); }
-  getLfoDepthForTarget(target, depth) { return getLfoDepthForTarget(target, depth); }
-  disconnectLfo(lfoId) { disconnectLfoNode(this, lfoId); }
-  routeLfo(lfoId) { routeLfoNode(this, lfoId); }
-  connectLfoToVoice(lfoId, voice) { connectLfoVoice(this, lfoId, voice); }
-  refreshLfoRouting() { refreshLfoRoutes(this); }
-  setClockBpm(bpm) { setLfoClockBpm(this, bpm); }
-  updateSyncedLfoRates() { syncLfoRates(this); }
-  setSyncedLfoMotionEnabled(isRunning) { setLfoMotionEnabled(this, isRunning); }
-  restartSyncedLfoPhase() { restartLfoPhase(this); }
-  updateMasterGain() { if (!this.audioContext || !this.masterGain) return; const now = this.audioContext.currentTime; this.masterGain.gain.setTargetAtTime(this.params.masterVolume * this.expression, now, 0.01); }
-  setExpressionFromCC(ccValue) { this.expression = Math.max(0, Math.min(1, ccValue / 127)); this.updateMasterGain(); }
-  stopVoiceImmediately(voiceId) { stopVoiceNow(this, voiceId); }
+  initLfos() {
+    initLfoState(this);
+  }
+
+  createLfo(lfoId) {
+    createLfoNode(this, lfoId);
+  }
+
+  updateLfoFromParams(lfoId) {
+    applyLfoFromParams(this, lfoId);
+  }
+
+  resolveLfoRate(rateMode, freeRate, division) {
+    return getResolvedLfoRate(this, rateMode, freeRate, division);
+  }
+
+  getLfoDepthForTarget(target, depth) {
+    return getLfoDepthForTarget(target, depth);
+  }
+
+  disconnectLfo(lfoId) {
+    disconnectLfoNode(this, lfoId);
+  }
+
+  routeLfo(lfoId) {
+    routeLfoNode(this, lfoId);
+  }
+
+  connectLfoToVoice(lfoId, voice) {
+    connectLfoVoice(this, lfoId, voice);
+  }
+
+  refreshLfoRouting() {
+    refreshLfoRoutes(this);
+  }
+
+  setClockBpm(bpm) {
+    setLfoClockBpm(this, bpm);
+  }
+
+  updateSyncedLfoRates() {
+    syncLfoRates(this);
+  }
+
+  setSyncedLfoMotionEnabled(isRunning) {
+    setLfoMotionEnabled(this, isRunning);
+  }
+
+  restartSyncedLfoPhase() {
+    restartLfoPhase(this);
+  }
+
+  updateMasterGain() {
+    if (!this.audioContext || !this.masterGain) return;
+    const now = this.audioContext.currentTime;
+    this.masterGain.gain.setTargetAtTime(this.params.masterVolume * this.expression, now, 0.01);
+  }
+
+  setExpressionFromCC(ccValue) {
+    this.expression = Math.max(0, Math.min(1, ccValue / 127));
+    this.updateMasterGain();
+  }
+
+  stopVoiceImmediately(voiceId) {
+    stopVoiceNow(this, voiceId);
+  }
   noteOn(note, velocity = 127, voiceId = note) {
     startNote(this, note, velocity, voiceId, this.connectLfoToVoice.bind(this));
   }
-  noteOff(voiceId) { releaseNote(this, voiceId); }
-  allNotesOff() { releaseAllNotes(this); }
-  forceAllNotesOff() { panicAllNotes(this); }
-  handleSustainPedal(ccValue) { applySustainPedal(this, ccValue); }
+  noteOff(voiceId) {
+    releaseNote(this, voiceId);
+  }
+
+  allNotesOff() {
+    releaseAllNotes(this);
+  }
+
+  forceAllNotesOff() {
+    panicAllNotes(this);
+  }
+
+  handleSustainPedal(ccValue) {
+    applySustainPedal(this, ccValue);
+  }
 }
