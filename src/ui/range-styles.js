@@ -43,9 +43,24 @@ export function syncFilterRangeStyle(input, value) {
   }
 }
 
+export function syncMasterRangeStyle(input, value) {
+  if (!isSingleInput(input)) return;
+  const masterPct = `${Math.round(Number(value) * 100)}%`;
+  input.style.setProperty("--master-pct", masterPct);
+
+  const wrap = input.closest(".master-volume-wrap");
+  if (wrap) {
+    wrap.style.setProperty("--master-pct", masterPct);
+  }
+}
+
 export function syncRangeStyleForParam(paramName, input, value) {
   if (paramName === "osc1Level" || paramName === "osc2Level") {
     syncLevelRangeStyle(input, value);
+    return;
+  }
+  if (paramName === "masterVolume") {
+    syncMasterRangeStyle(input, value);
     return;
   }
   if (paramName === "osc1Detune" || paramName === "osc2Detune") {
