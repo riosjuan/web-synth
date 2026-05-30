@@ -396,7 +396,7 @@ output {
 }
 
 fieldset {
-  border: var(--line);
+  border: 0;
   margin: 0;
   padding: 0.4rem;
   display: grid;
