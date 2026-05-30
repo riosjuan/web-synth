@@ -1,6 +1,7 @@
 import { formatParamValue, clampToConfig } from "./audio-utils.js";
 import { buildCcMapTable as renderCcMapTable, bindCcDialog as attachCcDialog } from "./ui/cc-map.js";
 import { syncRangeStyleForParam } from "./ui/range-styles.js";
+import { updateLfoUiState as applyLfoUiState } from "./ui/lfo-ui.js";
 
 export function createControlBinder(params, targetLabels, ccMap) {
   const inputByParam = {};
@@ -226,21 +227,6 @@ export function createControlBinder(params, targetLabels, ccMap) {
     redrawEnvelope = draw;
   }
 
-  function updateLfoUiState() {
-    ["lfo1", "lfo2"].forEach((lfoId) => {
-      const rateInput = inputByParam[`${lfoId}Rate`];
-      const divisionInput = inputByParam[`${lfoId}Division`];
-      const rateMode = params[`${lfoId}RateMode`];
-      const isSync = rateMode === "sync";
-      if (rateInput && !Array.isArray(rateInput)) {
-        rateInput.disabled = isSync;
-      }
-      if (divisionInput && !Array.isArray(divisionInput)) {
-        divisionInput.disabled = !isSync;
-      }
-    });
-  }
-
   function bindControls(onParamChange) {
     const controls = document.querySelectorAll("[data-param]");
     controls.forEach((el) => {
@@ -271,7 +257,7 @@ export function createControlBinder(params, targetLabels, ccMap) {
         updateParamFromUI(paramName, value, onParamChange);
       });
     });
-    updateLfoUiState();
+    applyLfoUiState(params, inputByParam);
     setupEnvelopeEditor(onParamChange);
   }
 
@@ -288,7 +274,7 @@ export function createControlBinder(params, targetLabels, ccMap) {
       output.textContent = formatParamValue(paramName, normalized);
     }
     syncRangeStyleForParam(paramName, input, normalized);
-    if (paramName.startsWith("lfo")) updateLfoUiState();
+    if (paramName.startsWith("lfo")) applyLfoUiState(params, inputByParam);
     if (redrawEnvelope && ["attack", "decay", "sustain", "release"].includes(paramName)) {
       redrawEnvelope();
     }
