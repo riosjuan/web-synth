@@ -100,11 +100,90 @@ legend {
   letter-spacing: 0.05em;
 }
 
-#audio-status,
-#midi-status,
-#midi-clock-status,
+.status-value,
 output {
   font-size: var(--type-ui);
+}
+
+.system-panel {
+  gap: var(--space-3);
+}
+
+.system-grid {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.system-block {
+  border: var(--line);
+  padding: var(--space-2);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.system-line {
+  display: grid;
+  gap: var(--space-2);
+  align-items: center;
+  grid-template-columns: 10rem minmax(0, 1fr);
+  margin: 0;
+}
+
+.status-pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.status-label {
+  font-size: var(--type-label);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.system-line > select {
+  justify-self: start;
+  min-width: 110px;
+}
+
+.system-line > button {
+  width: 100%;
+}
+
+.status-value {
+  min-width: 0;
+  justify-self: start;
+  text-transform: lowercase;
+  font-variant-numeric: tabular-nums;
+  border: var(--line);
+  padding: 0.16rem 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.status-value::before {
+  content: "";
+  width: 0.42rem;
+  height: 0.42rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-value.is-running::before,
+.status-value.is-playing::before {
+  background: currentColor;
+}
+
+.status-value.is-error {
+  border-style: double;
+}
+
+.status-value.is-stopped::before {
+  border-radius: 0;
 }
 
 .table-wrap {
@@ -626,6 +705,15 @@ button:active {
 }
 
 @media (max-width: 620px) {
+  .system-line {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+
+  .system-line > select {
+    width: 100%;
+  }
+
   fieldset {
     grid-template-columns: 1fr;
   }

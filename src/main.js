@@ -16,11 +16,14 @@ const MIDI_REALTIME = {
 
 const midiStatus = document.getElementById("midi-status");
 const midiClockStatus = document.getElementById("midi-clock-status");
+const midiClockBpm = document.getElementById("midi-clock-bpm");
 const audioStatus = document.getElementById("audio-status");
 const startAudioButton = document.getElementById("start-audio");
 const midiChannelSelect = document.getElementById("midi-channel");
 const themeToggleButton = document.getElementById("theme-toggle");
 let selectedMidiChannel = "all";
+
+const STATUS_STATES = ["is-locked", "is-running", "is-error", "is-waiting", "is-playing", "is-stopped"];
 
 const controls = createControlBinder(params, TARGET_LABELS, MIDI_CC_MAP);
 
@@ -31,19 +34,30 @@ function onParamChange(paramName, value) {
 async function handleStartAudio() {
   try {
     await synth.init();
-    audioStatus.textContent = "Audio: running";
+    setStatus(audioStatus, "running", "running");
   } catch (_error) {
-    audioStatus.textContent = "Audio: failed to start";
+    setStatus(audioStatus, "failed to start", "error");
   }
 }
 
 function updateClockStatusText() {
   if (!synth.clockBpm) {
-    midiClockStatus.textContent = "Clock: waiting for ticks";
+    setStatus(midiClockBpm, "--.- BPM", "waiting");
+    setStatus(midiClockStatus, "waiting", "waiting");
     return;
   }
   const state = synth.isClockRunning ? "playing" : "stopped";
-  midiClockStatus.textContent = `Clock: ${synth.clockBpm.toFixed(1)} BPM (${state})`;
+  setStatus(midiClockBpm, `${synth.clockBpm.toFixed(1)} BPM`, state);
+  setStatus(midiClockStatus, state, state);
+}
+
+function setStatus(element, text, state) {
+  if (!element) return;
+  element.textContent = text;
+  element.classList.remove(...STATUS_STATES);
+  if (state) {
+    element.classList.add(`is-${state}`);
+  }
 }
 
 function applyTheme(theme) {
@@ -162,10 +176,18 @@ function handleMidiMessage(event) {
 
 function init() {
   initThemeToggle();
+  setStatus(audioStatus, "locked", "locked");
+  setStatus(midiStatus, "checking...", "waiting");
+  setStatus(midiClockBpm, "--.- BPM", "waiting");
+  setStatus(midiClockStatus, "waiting", "waiting");
   controls.bindControls(onParamChange);
   controls.buildCcMapTable();
   controls.bindCcDialog();
-  initMidi({ midiStatusEl: midiStatus, onMidiMessage: handleMidiMessage });
+  initMidi({
+    midiStatusEl: midiStatus,
+    onMidiMessage: handleMidiMessage,
+    onMidiStatusChange: (text, state) => setStatus(midiStatus, text, state),
+  });
 
   midiChannelSelect.addEventListener("change", () => {
     synth.allNotesOff();

@@ -1,6 +1,11 @@
-export async function initMidi({ midiStatusEl, onMidiMessage }) {
+export async function initMidi({ midiStatusEl, onMidiMessage, onMidiStatusChange }) {
+  const setStatus = (text, state) => {
+    midiStatusEl.textContent = text;
+    if (onMidiStatusChange) onMidiStatusChange(text, state);
+  };
+
   if (!("requestMIDIAccess" in navigator)) {
-    midiStatusEl.textContent = "MIDI: not supported in this browser";
+    setStatus("not supported in this browser", "error");
     return;
   }
 
@@ -10,25 +15,25 @@ export async function initMidi({ midiStatusEl, onMidiMessage }) {
       input.onmidimessage = onMidiMessage;
     };
     midiAccess.inputs.forEach(bindInput);
-    updateMidiStatus(midiAccess, midiStatusEl);
+    updateMidiStatus(midiAccess, setStatus);
 
     midiAccess.onstatechange = () => {
       midiAccess.inputs.forEach(bindInput);
-      updateMidiStatus(midiAccess, midiStatusEl);
+      updateMidiStatus(midiAccess, setStatus);
     };
   } catch (_error) {
-    midiStatusEl.textContent = "MIDI: access denied or unavailable";
+    setStatus("access denied or unavailable", "error");
   }
 }
 
-function updateMidiStatus(midiAccess, midiStatusEl) {
+function updateMidiStatus(midiAccess, setStatus) {
   const names = [];
   midiAccess.inputs.forEach((input) => {
     names.push(input.name || "Unnamed MIDI input");
   });
   if (names.length === 0) {
-    midiStatusEl.textContent = "MIDI: available, no inputs connected";
+    setStatus("available, no inputs connected", "stopped");
     return;
   }
-  midiStatusEl.textContent = `MIDI: connected (${names.join(", ")})`;
+  setStatus(`connected (${names.join(", ")})`, "running");
 }

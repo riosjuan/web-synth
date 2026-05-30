@@ -25,36 +25,59 @@
     </section>
 
     <main class="app">
-      <section class="panel">
+      <section class="panel system-panel">
         <h2>System</h2>
-        <div class="row">
-          <button id="start-audio" type="button">Start Audio</button>
-          <span id="audio-status">Audio: locked</span>
+        <div class="system-grid">
+          <div class="system-block system-action">
+            <div class="system-line">
+              <span class="status-label">Engine</span>
+              <button id="start-audio" type="button">Start Audio</button>
+            </div>
+            <p class="system-line" aria-live="polite">
+              <span class="status-label">Audio</span>
+              <span class="status-value is-locked" id="audio-status">locked</span>
+            </p>
+          </div>
+
+          <div class="system-block">
+            <div class="system-line">
+              <label class="status-label" for="midi-channel">MIDI Channel</label>
+              <select id="midi-channel">
+                <option value="all" selected>All</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+              </select>
+            </div>
+            <p class="system-line" aria-live="polite">
+              <span class="status-label">MIDI</span>
+              <span class="status-value is-waiting" id="midi-status">checking...</span>
+            </p>
+          </div>
+
+          <div class="system-block">
+            <div class="system-line" aria-live="polite">
+              <span class="status-label">Clock</span>
+              <div class="status-pair">
+                <span class="status-value is-waiting" id="midi-clock-bpm">--.- BPM</span>
+                <span class="status-value is-waiting" id="midi-clock-status">waiting</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="row">
-          <label for="midi-channel">MIDI Channel</label>
-          <select id="midi-channel">
-            <option value="all" selected>All</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-            <option value="12">12</option>
-            <option value="13">13</option>
-            <option value="14">14</option>
-            <option value="15">15</option>
-            <option value="16">16</option>
-          </select>
-        </div>
-        <p id="midi-status">MIDI: checking...</p>
-        <p id="midi-clock-status">Clock: waiting for ticks</p>
       </section>
 
       <section class="panel">
