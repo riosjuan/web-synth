@@ -1,4 +1,4 @@
-# Web Synth
+# Poly-One
 
 A browser-based polyphonic synthesizer built with the Web Audio API and plain ES modules.
 

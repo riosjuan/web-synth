@@ -42,8 +42,8 @@ h1 {
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  text-transform: none;
+  letter-spacing: 0.04em;
 }
 
 .topbar {
