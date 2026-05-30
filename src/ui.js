@@ -1,5 +1,6 @@
 import { formatParamValue, clampToConfig } from "./audio-utils.js";
 import { buildCcMapTable as renderCcMapTable, bindCcDialog as attachCcDialog } from "./ui/cc-map.js";
+import { syncRangeStyleForParam } from "./ui/range-styles.js";
 
 export function createControlBinder(params, targetLabels, ccMap) {
   const inputByParam = {};
@@ -256,26 +257,7 @@ export function createControlBinder(params, targetLabels, ccMap) {
         outputByParam[paramName] = output;
         output.textContent = formatParamValue(paramName, params[paramName]);
       }
-      if ((paramName === "osc1Level" || paramName === "osc2Level") && !Array.isArray(inputByParam[paramName])) {
-        const levelPct = `${Math.round(Number(params[paramName]) * 100)}%`;
-        el.style.setProperty("--level-pct", levelPct);
-        const levelWrap = el.closest(".level-wrap");
-        if (levelWrap) levelWrap.style.setProperty("--level-pct", levelPct);
-      }
-      if ((paramName === "osc1Detune" || paramName === "osc2Detune") && !Array.isArray(inputByParam[paramName])) {
-        const detune = Number(params[paramName]);
-        const magnitude = `${Math.round((Math.abs(detune) / 50) * 50)}%`;
-        el.style.setProperty("--detune-left", detune < 0 ? magnitude : "0%");
-        el.style.setProperty("--detune-right", detune > 0 ? magnitude : "0%");
-        const thumb = `${Math.round(((detune + 50) / 100) * 100)}%`;
-        el.style.setProperty("--detune-thumb", thumb);
-        const wrap = el.closest(".detune-wrap");
-        if (wrap) {
-          wrap.style.setProperty("--detune-left", detune < 0 ? magnitude : "0%");
-          wrap.style.setProperty("--detune-right", detune > 0 ? magnitude : "0%");
-          wrap.style.setProperty("--detune-thumb", thumb);
-        }
-      }
+      syncRangeStyleForParam(paramName, inputByParam[paramName], params[paramName]);
       el.addEventListener("input", () => {
         const isSelect = el.tagName.toLowerCase() === "select";
         const isRadio = el.type === "radio";
@@ -305,26 +287,7 @@ export function createControlBinder(params, targetLabels, ccMap) {
     if (output && typeof normalized === "number") {
       output.textContent = formatParamValue(paramName, normalized);
     }
-    if ((paramName === "osc1Level" || paramName === "osc2Level") && input && !Array.isArray(input)) {
-      const levelPct = `${Math.round(Number(normalized) * 100)}%`;
-      input.style.setProperty("--level-pct", levelPct);
-      const levelWrap = input.closest(".level-wrap");
-      if (levelWrap) levelWrap.style.setProperty("--level-pct", levelPct);
-    }
-    if ((paramName === "osc1Detune" || paramName === "osc2Detune") && input && !Array.isArray(input)) {
-      const detune = Number(normalized);
-      const magnitude = `${Math.round((Math.abs(detune) / 50) * 50)}%`;
-      input.style.setProperty("--detune-left", detune < 0 ? magnitude : "0%");
-      input.style.setProperty("--detune-right", detune > 0 ? magnitude : "0%");
-      const thumb = `${Math.round(((detune + 50) / 100) * 100)}%`;
-      input.style.setProperty("--detune-thumb", thumb);
-      const wrap = input.closest(".detune-wrap");
-      if (wrap) {
-        wrap.style.setProperty("--detune-left", detune < 0 ? magnitude : "0%");
-        wrap.style.setProperty("--detune-right", detune > 0 ? magnitude : "0%");
-        wrap.style.setProperty("--detune-thumb", thumb);
-      }
-    }
+    syncRangeStyleForParam(paramName, input, normalized);
     if (paramName.startsWith("lfo")) updateLfoUiState();
     if (redrawEnvelope && ["attack", "decay", "sustain", "release"].includes(paramName)) {
       redrawEnvelope();
