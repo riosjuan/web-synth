@@ -6,6 +6,7 @@
   color-scheme: light dark;
   --paper: light-dark(#f7f7f7, #0f1113);
   --ink: light-dark(#101010, #eceff1);
+  --accent: light-dark(#5f4ab2, #8d7ad6);
   --papper: var(--paper);
   --line: 1px solid var(--ink);
   --space-1: 0.25rem;
@@ -18,6 +19,8 @@
   --type-ui: 0.9rem;
   --type-control-label: 1rem;
   --type-label: 0.86rem;
+  --type-brand: clamp(1.5rem, 2vw, 2.2rem);
+  --type-module: 0.82rem;
 }
 
 body {
@@ -40,15 +43,17 @@ body {
 
 h1 {
   margin: 0;
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-size: var(--type-brand);
+  font-weight: 800;
   text-transform: none;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
+  line-height: 0.95;
 }
 
 .topbar {
-  border: var(--line);
-  padding: var(--space-2);
+  border: 0;
+  border-bottom: 2px solid var(--ink);
+  padding: 0.6rem var(--space-2);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -56,10 +61,24 @@ h1 {
   width: 100%;
 }
 
+.brand-block {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.brand-meta {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.82;
+}
+
 .topbar-actions {
   display: flex;
   gap: var(--space-2);
   align-items: center;
+  align-self: start;
 }
 
 .theme-toggle:hover {
@@ -73,10 +92,10 @@ h1 {
 
 h2 {
   margin: 0;
-  font-size: var(--type-label);
+  font-size: var(--type-module);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 }
 
 .panel {
@@ -84,6 +103,28 @@ h2 {
   padding: var(--space-2);
   display: grid;
   gap: var(--space-2);
+  position: relative;
+}
+
+.app {
+  counter-reset: module;
+}
+
+.panel > h2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  border-bottom: var(--line);
+  padding-bottom: 0.28rem;
+}
+
+.panel > h2::before {
+  counter-increment: module;
+  content: counter(module, decimal-leading-zero) ".";
+  color: var(--accent);
+  font-weight: 700;
+  margin-right: 0.55rem;
 }
 
 .row {
@@ -181,7 +222,8 @@ output {
 
 .status-value.is-running::before,
 .status-value.is-playing::before {
-  background: currentColor;
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .status-value.is-error {
@@ -194,6 +236,7 @@ output {
 
 .master-panel {
   gap: var(--space-2);
+  overflow: hidden;
 }
 
 .master-control {
@@ -257,8 +300,8 @@ output {
   border: var(--line);
   background: linear-gradient(
     to top,
-    var(--ink) 0%,
-    var(--ink) var(--master-pct, 60%),
+    var(--accent) 0%,
+    var(--accent) var(--master-pct, 60%),
     var(--paper) var(--master-pct, 60%),
     var(--paper) 100%
   );
@@ -504,8 +547,8 @@ fieldset>select {
   border: 1px solid var(--ink);
   background: linear-gradient(
     to top,
-    var(--ink) 0%,
-    var(--ink) var(--level-pct, 50%),
+    var(--accent) 0%,
+    var(--accent) var(--level-pct, 50%),
     var(--paper) var(--level-pct, 50%),
     var(--paper) 100%
   );
@@ -613,7 +656,7 @@ fieldset>select {
 }
 
 .segment-group input[type="radio"]:checked + .segment-option {
-  background: var(--ink);
+  background: var(--accent);
   color: var(--paper);
 }
 
@@ -668,9 +711,9 @@ fieldset>select {
     to right,
     var(--paper) 0%,
     var(--paper) calc(50% - var(--detune-left, 0%)),
-    var(--ink) calc(50% - var(--detune-left, 0%)),
-    var(--ink) 50%,
-    var(--ink) calc(50% + var(--detune-right, 0%)),
+    var(--accent) calc(50% - var(--detune-left, 0%)),
+    var(--accent) 50%,
+    var(--accent) calc(50% + var(--detune-right, 0%)),
     var(--paper) calc(50% + var(--detune-right, 0%)),
     var(--paper) 100%
   );
@@ -770,8 +813,8 @@ fieldset>select {
   border: var(--line);
   background: linear-gradient(
     to right,
-    var(--ink) 0%,
-    var(--ink) var(--filter-pct, 50%),
+    var(--accent) 0%,
+    var(--accent) var(--filter-pct, 50%),
     var(--paper) var(--filter-pct, 50%),
     var(--paper) 100%
   );
@@ -821,13 +864,13 @@ fieldset>select {
 .wave-option path {
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.6;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .wave-group input[type="radio"]:checked + .wave-option {
-  background: var(--ink);
+  background: var(--accent);
   color: var(--paper);
 }
 
@@ -918,6 +961,21 @@ button:active {
 }
 
 @media (max-width: 620px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    align-self: stretch;
+    justify-content: flex-end;
+  }
+
+  .brand-meta {
+    font-size: 0.66rem;
+  }
+
   .system-master-cluster {
     grid-template-columns: 1fr;
     gap: var(--space-2);
@@ -958,8 +1016,8 @@ button:active {
     direction: ltr;
     background: linear-gradient(
       to right,
-      var(--ink) 0%,
-      var(--ink) var(--master-pct, 60%),
+      var(--accent) 0%,
+      var(--accent) var(--master-pct, 60%),
       var(--paper) var(--master-pct, 60%),
       var(--paper) 100%
     );
@@ -1016,8 +1074,8 @@ button:active {
     -webkit-appearance: none;
     background: linear-gradient(
       to right,
-      var(--ink) 0%,
-      var(--ink) var(--level-pct, 50%),
+      var(--accent) 0%,
+      var(--accent) var(--level-pct, 50%),
       var(--paper) var(--level-pct, 50%),
       var(--paper) 100%
     );
