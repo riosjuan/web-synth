@@ -54,6 +54,22 @@ export function syncMasterRangeStyle(input, value) {
   }
 }
 
+export function syncLfoRangeStyle(input, value) {
+  if (!isSingleInput(input)) return;
+  const min = Number(input.min);
+  const max = Number(input.max);
+  const numericValue = Number(value);
+  if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min || !Number.isFinite(numericValue)) return;
+
+  const pct = `${Math.round(((numericValue - min) / (max - min)) * 100)}%`;
+  input.style.setProperty("--lfo-pct", pct);
+
+  const wrap = input.closest(".lfo-range-wrap");
+  if (wrap) {
+    wrap.style.setProperty("--lfo-pct", pct);
+  }
+}
+
 export function syncRangeStyleForParam(paramName, input, value) {
   if (paramName === "osc1Level" || paramName === "osc2Level") {
     syncLevelRangeStyle(input, value);
@@ -65,6 +81,10 @@ export function syncRangeStyleForParam(paramName, input, value) {
   }
   if (paramName === "osc1Detune" || paramName === "osc2Detune") {
     syncDetuneRangeStyle(input, value);
+    return;
+  }
+  if (paramName === "lfo1Rate" || paramName === "lfo1Depth" || paramName === "lfo2Rate" || paramName === "lfo2Depth") {
+    syncLfoRangeStyle(input, value);
     return;
   }
   if (paramName === "filterCutoff" || paramName === "filterQ") {
