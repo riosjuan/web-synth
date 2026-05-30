@@ -32,6 +32,17 @@ export function syncDetuneRangeStyle(input, value) {
   }
 }
 
+export function syncFilterRangeStyle(input, value) {
+  if (!isSingleInput(input)) return;
+  const filterPct = `${Math.round((Number(value) / 127) * 100)}%`;
+  input.style.setProperty("--filter-pct", filterPct);
+
+  const wrap = input.closest(".filter-wrap");
+  if (wrap) {
+    wrap.style.setProperty("--filter-pct", filterPct);
+  }
+}
+
 export function syncRangeStyleForParam(paramName, input, value) {
   if (paramName === "osc1Level" || paramName === "osc2Level") {
     syncLevelRangeStyle(input, value);
@@ -39,5 +50,9 @@ export function syncRangeStyleForParam(paramName, input, value) {
   }
   if (paramName === "osc1Detune" || paramName === "osc2Detune") {
     syncDetuneRangeStyle(input, value);
+    return;
+  }
+  if (paramName === "filterCutoff" || paramName === "filterQ") {
+    syncFilterRangeStyle(input, value);
   }
 }

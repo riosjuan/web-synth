@@ -370,30 +370,42 @@
 
       <section class="panel">
         <h2>Filter</h2>
-        <fieldset>
-          <label for="filter-cutoff">Cutoff</label>
-          <output id="filter-cutoff-value">109</output>
-          <input
-            id="filter-cutoff"
-            data-param="filterCutoff"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="109"
-          />
+        <fieldset class="filter-controls">
+          <div class="filter-control">
+            <div class="filter-head">
+              <label for="filter-cutoff">Cutoff</label>
+              <output id="filter-cutoff-value">109</output>
+            </div>
+            <div class="filter-wrap">
+              <input
+                id="filter-cutoff"
+                data-param="filterCutoff"
+                type="range"
+                min="0"
+                max="127"
+                step="1"
+                value="109"
+              />
+            </div>
+          </div>
 
-          <label for="filter-q">Resonance</label>
-          <output id="filter-q-value">4</output>
-          <input
-            id="filter-q"
-            data-param="filterQ"
-            type="range"
-            min="0"
-            max="127"
-            step="1"
-            value="4"
-          />
+          <div class="filter-control">
+            <div class="filter-head">
+              <label for="filter-q">Resonance</label>
+              <output id="filter-q-value">4</output>
+            </div>
+            <div class="filter-wrap">
+              <input
+                id="filter-q"
+                data-param="filterQ"
+                type="range"
+                min="0"
+                max="127"
+                step="1"
+                value="4"
+              />
+            </div>
+          </div>
         </fieldset>
       </section>
 
